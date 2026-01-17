@@ -77,7 +77,7 @@ export default function Home() {
 
   return (
     <main className="bg-bg text-fg">
-      <section className="mx-auto max-w-6xl px-6 py-12">
+      <section className="mx-auto max-w-6xl px-6 py-14">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div className="max-w-3xl">
             <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
@@ -88,7 +88,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="relative h-64 w-full overflow-hidden rounded-2xl border border-border bg-card-muted shadow-sm ring-1 ring-border/60 md:h-72">
+          <div className="relative h-64 w-full overflow-hidden rounded-3xl border border-border/80 bg-card-muted shadow-md ring-1 ring-border/70 md:h-72">
             <div
               ref={lottieRef}
               className="absolute inset-0"
@@ -97,10 +97,10 @@ export default function Home() {
           </div>
         </div>
 
-        <div id="cases" className="mt-10 grid gap-6 md:grid-cols-3">
+        <div id="cases" className="mt-12 grid gap-6 md:grid-cols-3">
           <Link
             href="/studio/case1"
-            className="group rounded-2xl border border-border bg-card p-6 shadow-sm transition hover:shadow-md"
+            className="group rounded-2xl border border-border/70 bg-card-muted p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md hover:border-primary/30"
           >
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
@@ -123,7 +123,7 @@ export default function Home() {
 
           <Link
             href="/studio/case2"
-            className="group rounded-2xl border border-border bg-card p-6 shadow-sm transition hover:shadow-md"
+            className="group rounded-2xl border border-border/70 bg-card-muted p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md hover:border-primary/30"
           >
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
@@ -146,7 +146,7 @@ export default function Home() {
 
           <Link
             href="/studio/case3"
-            className="group rounded-2xl border border-border bg-card p-6 shadow-sm transition hover:shadow-md"
+            className="group rounded-2xl border border-border/70 bg-card-muted p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md hover:border-primary/30"
           >
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
