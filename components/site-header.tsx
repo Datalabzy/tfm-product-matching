@@ -18,14 +18,14 @@ export function SiteHeader() {
           </div>
         </div>
 
-        <nav className="flex items-center gap-2 sm:gap-3">
+        {/* <nav className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/#cases"
             className="rounded-xl border border-border px-3 py-2 text-xs sm:text-sm font-semibold text-fg hover:bg-card-muted"
           >
             Cases
           </Link>
-        </nav>
+        </nav> */}
       </div>
     </header>
   );
