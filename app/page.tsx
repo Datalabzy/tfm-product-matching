@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { Search, Repeat2, Link2 } from "lucide-react";
+import { Search, Repeat2, Link2, Sparkles } from "lucide-react";
 
 type LottieAnimation = { destroy?: () => void };
 type LottiePlayer = {
@@ -31,8 +31,9 @@ export default function Home() {
     const ensureLottie = () =>
       new Promise<LottiePlayer | undefined>((resolve) => {
         if (window.lottie) return resolve(window.lottie);
+
         const existing = document.querySelector(
-          'script[src="https://unpkg.com/lottie-web/build/player/lottie.min.js"]',
+          'script[src="https://unpkg.com/lottie-web/build/player/lottie.min.js"]'
         );
         if (existing) {
           existing.addEventListener("load", () => resolve(window.lottie), {
@@ -40,8 +41,10 @@ export default function Home() {
           });
           return;
         }
+
         const script = document.createElement("script");
-        script.src = "https://unpkg.com/lottie-web/build/player/lottie.min.js";
+        script.src =
+          "https://unpkg.com/lottie-web/build/player/lottie.min.js";
         script.async = true;
         script.onload = () => resolve(window.lottie);
         script.onerror = () => resolve(undefined);
@@ -54,6 +57,7 @@ export default function Home() {
         const data = await res.json();
         const lottieLib = await ensureLottie();
         if (cancelled || !lottieLib || !lottieRef.current) return;
+
         lottieRef.current.innerHTML = "";
         animationInstance = lottieLib.loadAnimation({
           container: lottieRef.current,
@@ -63,7 +67,7 @@ export default function Home() {
           animationData: data,
         });
       } catch {
-        // ignore load errors
+        // ignore
       }
     };
 
@@ -78,96 +82,119 @@ export default function Home() {
   return (
     <main className="bg-bg text-fg">
       <section className="mx-auto max-w-6xl px-6 py-14">
+        {/* HERO */}
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div className="max-w-3xl">
-            <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
-              Multimodal product matching
+            {/* TAG */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card-muted px-3 py-1 text-xs font-semibold text-fg">
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Sparkles className="h-3 w-3" />
+              </span>
+              TFM — Master Data Science
+            </div>
+
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+              Product Similarity & Matching
             </h1>
+
             <p className="mt-3 text-base leading-relaxed text-muted">
-              TFM project: one similarity engine for search, recommendations, and human-in-the-loop catalog matching.
+              Search and match products using multimodal embeddings (text and
+              image), with a human validation step for ambiguous cases.
             </p>
+
+            {/* TECH TAGS */}
+            <div className="mt-5 flex flex-wrap gap-2 text-sm">
+              <span className="rounded-full border border-border/70 bg-card-muted px-3 py-1 text-muted">
+                cosine similarity
+              </span>
+              <span className="rounded-full border border-border/70 bg-card-muted px-3 py-1 text-muted">
+                multimodal embeddings
+              </span>
+            </div>
           </div>
 
-          <div className="relative hidden h-64 w-full overflow-hidden rounded-3xl border border-border/80 bg-card-muted shadow-md ring-1 ring-border/70 md:block md:h-72">
+          {/* ANIMATION */}
+          <div className="relative hidden h-64 w-full overflow-hidden rounded-3xl border border-border/70 bg-primary/10 shadow-sm md:block md:h-72">
+            <div className="pointer-events-none absolute inset-0 from-transparent to-black/5" />
             <div
               ref={lottieRef}
-              className="absolute inset-0"
+              className="absolute inset-0 opacity-90 scale-[1.02]"
               aria-label="Hero animation"
             />
           </div>
         </div>
 
-        <div id="cases" className="mt-12 grid gap-6 md:grid-cols-3">
-          <Link
+        {/* CASES */}
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          <CaseCard
             href="/studio/case1"
-            className="group rounded-2xl border border-border/70 bg-card-muted p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md hover:border-primary/30"
-          >
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
-                <Repeat2 className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-                  Case 1
-                </p>
-                <h2 className="text-lg font-semibold">Semantic search</h2>
-              </div>
-            </div>
-            <p className="mt-3 text-sm leading-relaxed text-muted">
-              Free-text search ranked by embedding similarity.
-            </p>
-            <p className="mt-4 text-sm font-semibold text-primary group-hover:underline">
-              Go to Case 1 →
-            </p>
-          </Link>
+            icon={<Repeat2 className="h-5 w-5" />}
+            tag="Case 1"
+            title="Semantic search"
+            desc="Free-text queries ranked by embedding similarity."
+            cta="Go to Case 1 →"
+          />
 
-          <Link
+          <CaseCard
             href="/studio/case2"
-            className="group rounded-2xl border border-border/70 bg-card-muted p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md hover:border-primary/30"
-          >
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
-                <Search className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-                  Case 2
-                </p>
-                <h2 className="text-lg font-semibold">Similar products</h2>
-              </div>
-            </div>
-            <p className="mt-3 text-sm leading-relaxed text-muted">
-              Pick a product and fetch the top-K most similar items.
-            </p>
-            <p className="mt-4 text-sm font-semibold text-primary group-hover:underline">
-              Go to Case 2 →
-            </p>
-          </Link>
+            icon={<Search className="h-5 w-5" />}
+            tag="Case 2"
+            title="Similar products"
+            desc="Item-to-item recommendations based on vector similarity."
+            cta="Go to Case 2 →"
+          />
 
-          <Link
+          <CaseCard
             href="/studio/case3"
-            className="group rounded-2xl border border-border/70 bg-card-muted p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md hover:border-primary/30"
-          >
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
-                <Link2 className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-                  Case 3
-                </p>
-                <h2 className="text-lg font-semibold">Smart Connections</h2>
-              </div>
-            </div>
-            <p className="mt-3 text-sm leading-relaxed text-muted">
-              Link a client catalog to competitors with scored matches and validation.
-            </p>
-            <p className="mt-4 text-sm font-semibold text-primary group-hover:underline">
-              Go to Case 3 →
-            </p>
-          </Link>
+            icon={<Link2 className="h-5 w-5" />}
+            tag="Case 3"
+            title="Smart Connections"
+            desc="Client–competitor product matching with scoring and validation."
+            cta="Go to Case 3 →"
+          />
         </div>
       </section>
     </main>
+  );
+}
+
+function CaseCard({
+  href,
+  icon,
+  tag,
+  title,
+  desc,
+  cta,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  tag: string;
+  title: string;
+  desc: string;
+  cta: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group rounded-2xl border border-border/70 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+    >
+      <div className="flex items-center gap-3">
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
+          {icon}
+        </span>
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+            {tag}
+          </p>
+          <h2 className="text-lg font-semibold">{title}</h2>
+        </div>
+      </div>
+
+      <p className="mt-3 text-sm leading-relaxed text-muted">{desc}</p>
+
+      <p className="mt-4 text-sm font-semibold text-primary group-hover:underline">
+        {cta}
+      </p>
+    </Link>
   );
 }
