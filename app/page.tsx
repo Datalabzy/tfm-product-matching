@@ -88,7 +88,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="relative h-64 w-full overflow-hidden rounded-3xl border border-border/80 bg-card-muted shadow-md ring-1 ring-border/70 md:h-72">
+          <div className="relative hidden h-64 w-full overflow-hidden rounded-3xl border border-border/80 bg-card-muted shadow-md ring-1 ring-border/70 md:block md:h-72">
             <div
               ref={lottieRef}
               className="absolute inset-0"
