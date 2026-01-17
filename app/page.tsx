@@ -1,20 +1,100 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { Search, Repeat2, Link2 } from "lucide-react";
 
+type LottieAnimation = { destroy?: () => void };
+type LottiePlayer = {
+  loadAnimation: (options: {
+    container: Element;
+    renderer: "svg" | "canvas" | "html";
+    loop?: boolean;
+    autoplay?: boolean;
+    animationData: unknown;
+  }) => LottieAnimation;
+};
+
+declare global {
+  interface Window {
+    lottie?: LottiePlayer;
+  }
+}
+
 export default function Home() {
+  const lottieRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    let animationInstance: LottieAnimation | undefined;
+    let cancelled = false;
+
+    const ensureLottie = () =>
+      new Promise<LottiePlayer | undefined>((resolve) => {
+        if (window.lottie) return resolve(window.lottie);
+        const existing = document.querySelector(
+          'script[src="https://unpkg.com/lottie-web/build/player/lottie.min.js"]',
+        );
+        if (existing) {
+          existing.addEventListener("load", () => resolve(window.lottie), {
+            once: true,
+          });
+          return;
+        }
+        const script = document.createElement("script");
+        script.src = "https://unpkg.com/lottie-web/build/player/lottie.min.js";
+        script.async = true;
+        script.onload = () => resolve(window.lottie);
+        script.onerror = () => resolve(undefined);
+        document.body.appendChild(script);
+      });
+
+    const loadAnimation = async () => {
+      try {
+        const res = await fetch("/animation.json");
+        const data = await res.json();
+        const lottieLib = await ensureLottie();
+        if (cancelled || !lottieLib || !lottieRef.current) return;
+        lottieRef.current.innerHTML = "";
+        animationInstance = lottieLib.loadAnimation({
+          container: lottieRef.current,
+          renderer: "svg",
+          loop: true,
+          autoplay: true,
+          animationData: data,
+        });
+      } catch {
+        // ignore load errors
+      }
+    };
+
+    loadAnimation();
+
+    return () => {
+      cancelled = true;
+      animationInstance?.destroy?.();
+    };
+  }, []);
+
   return (
     <main className="bg-bg text-fg">
       <section className="mx-auto max-w-6xl px-6 py-12">
-        <div className="max-w-3xl">
-          <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
-            TFM — Product similarity and matching using multimodal embeddings
-          </h1>
-          <p className="mt-3 text-base leading-relaxed text-muted">
-            This project demonstrates a single similarity engine applied to two
-            scenarios: (1) semantic search & item-to-item recommendations, and
-            (2) smart connections (client product → equivalent competitor
-            products) with human-in-the-loop validation.
-          </p>
+        <div className="grid items-center gap-10 lg:grid-cols-2">
+          <div className="max-w-3xl">
+            <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+              Multimodal product matching
+            </h1>
+            <p className="mt-3 text-base leading-relaxed text-muted">
+              TFM project: one similarity engine for search, recommendations, and human-in-the-loop catalog matching.
+            </p>
+          </div>
+
+          <div className="relative h-64 w-full overflow-hidden rounded-2xl border border-border bg-card-muted shadow-sm ring-1 ring-border/60 md:h-72">
+            <div
+              ref={lottieRef}
+              className="absolute inset-0"
+              aria-label="Hero animation"
+            />
+          </div>
         </div>
 
         <div id="cases" className="mt-10 grid gap-6 md:grid-cols-3">
@@ -34,7 +114,7 @@ export default function Home() {
               </div>
             </div>
             <p className="mt-3 text-sm leading-relaxed text-muted">
-              Free-text query → embedding → cosine similarity ranking.
+              Free-text search ranked by embedding similarity.
             </p>
             <p className="mt-4 text-sm font-semibold text-primary group-hover:underline">
               Go to Case 1 →
@@ -57,7 +137,7 @@ export default function Home() {
               </div>
             </div>
             <p className="mt-3 text-sm leading-relaxed text-muted">
-              Pick a product → retrieve top-K most similar items (item-to-item).
+              Pick a product and fetch the top-K most similar items.
             </p>
             <p className="mt-4 text-sm font-semibold text-primary group-hover:underline">
               Go to Case 2 →
@@ -80,27 +160,12 @@ export default function Home() {
               </div>
             </div>
             <p className="mt-3 text-sm leading-relaxed text-muted">
-              Client catalog → competitor catalogs. Suggest matches with scores,
-              thresholding and manual validation.
+              Link a client catalog to competitors with scored matches and validation.
             </p>
             <p className="mt-4 text-sm font-semibold text-primary group-hover:underline">
               Go to Case 3 →
             </p>
           </Link>
-        </div>
-
-        <div className="mt-12 rounded-2xl border border-border bg-card-muted p-6">
-          <h3 className="text-base font-semibold">Notes</h3>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted">
-            <li>
-              The UI is intentionally minimal: focus on embeddings, ranking,
-              evaluation and validation workflows.
-            </li>
-            <li>
-              Similarity can be computed from text-only, image-only, or a combined
-              multimodal representation.
-            </li>
-          </ul>
         </div>
       </section>
     </main>
