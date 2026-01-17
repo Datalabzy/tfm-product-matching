@@ -86,15 +86,15 @@ export default function Home() {
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div className="max-w-3xl">
             {/* TAG */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card-muted px-3 py-1 text-xs font-semibold text-fg">
-              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-primary/5 px-3 py-1 text-xs font-semibold text-fg">
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full text-primary">
                 <Sparkles className="h-3 w-3" />
               </span>
               TFM — Master Data Science
             </div>
 
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
-              Product Similarity & Matching
+            <h1 className="mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
+              Multimodal Product Similarity & Matching
             </h1>
 
             <p className="mt-3 text-base leading-relaxed text-muted">
@@ -104,17 +104,17 @@ export default function Home() {
 
             {/* TECH TAGS */}
             <div className="mt-5 flex flex-wrap gap-2 text-sm">
-              <span className="rounded-full border border-border/70 bg-card-muted px-3 py-1 text-muted">
+              <span className="rounded-full border border-border/70 bg-primary/5 px-3 py-1 text-muted">
                 cosine similarity
               </span>
-              <span className="rounded-full border border-border/70 bg-card-muted px-3 py-1 text-muted">
+              <span className="rounded-full border border-border/70 bg-primary/5 px-3 py-1 text-muted">
                 multimodal embeddings
               </span>
             </div>
           </div>
 
           {/* ANIMATION */}
-          <div className="relative hidden h-64 w-full overflow-hidden rounded-3xl border border-border/70 bg-primary/10 shadow-sm md:block md:h-72">
+          <div className="relative hidden h-64 w-full overflow-hidden rounded-3xl border border-border/70 bg-primary/5 shadow-sm md:block md:h-72">
             <div className="pointer-events-none absolute inset-0 from-transparent to-black/5" />
             <div
               ref={lottieRef}
@@ -179,7 +179,7 @@ function CaseCard({
       className="group rounded-2xl border border-border/70 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="flex items-center gap-3">
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/5 text-primary ring-1 ring-primary/15">
           {icon}
         </span>
         <div>
