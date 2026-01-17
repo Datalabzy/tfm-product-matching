@@ -23,7 +23,7 @@ export default function Home() {
             className="group rounded-2xl border border-border bg-card p-6 shadow-sm transition hover:shadow-md"
           >
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-card-muted text-primary">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
                 <Repeat2 className="h-5 w-5" />
               </span>
               <div>
@@ -46,7 +46,7 @@ export default function Home() {
             className="group rounded-2xl border border-border bg-card p-6 shadow-sm transition hover:shadow-md"
           >
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-card-muted text-primary">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
                 <Search className="h-5 w-5" />
               </span>
               <div>
@@ -69,7 +69,7 @@ export default function Home() {
             className="group rounded-2xl border border-border bg-card p-6 shadow-sm transition hover:shadow-md"
           >
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-card-muted text-primary">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
                 <Link2 className="h-5 w-5" />
               </span>
               <div>
