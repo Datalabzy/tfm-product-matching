@@ -141,7 +141,7 @@ export default function Home() {
 
         <div className="mt-6 grid gap-6 md:grid-cols-3">
           <CaseCard
-            href="/studio/case1"
+            href="/recommender"
             icon={<Repeat2 className="h-5 w-5" />}
             tag="Case 1"
             title="Semantic search"
@@ -150,7 +150,7 @@ export default function Home() {
           />
 
           <CaseCard
-            href="/studio/case2"
+            href="/similar"
             icon={<Search className="h-5 w-5" />}
             tag="Case 2"
             title="Similar products"
@@ -159,7 +159,7 @@ export default function Home() {
           />
 
           <CaseCard
-            href="/studio/case3"
+            href="/matching"
             icon={<Link2 className="h-5 w-5" />}
             tag="Case 3"
             title="Smart Connections"
