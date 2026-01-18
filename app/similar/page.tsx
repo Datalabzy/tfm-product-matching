@@ -1,0 +1,321 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+
+type Result = { id: string; title: string; description: string; image_url?: string; image?: string; similarity?: number };
+
+export default function SimilarPage() {
+  const params = useSearchParams();
+  const [items, setItems] = useState<Result[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Result | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [topK, setTopK] = useState(12);
+  const [mode, setMode] = useState<"Todo" | "Solo texto" | "Solo imagen">("Todo");
+  const [sortBy, setSortBy] = useState<"score" | "title">("score");
+  const [signals, setSignals] = useState<{ title: boolean; description: boolean; category: boolean; image: boolean }>({
+    title: true,
+    description: true,
+    category: false,
+    image: true,
+  });
+
+  const paramId = params.get("productId");
+
+  const fetchSimilar = async (productId: string) => {
+    if (!productId) return;
+    setLoading(true);
+    const signalsParam = JSON.stringify(signals);
+    const modeApi = mode === "Todo" ? "mixto" : mode === "Solo texto" ? "texto" : "imagen";
+    const qs = new URLSearchParams({
+      productId,
+      topK: String(topK),
+      mode: modeApi,
+      signals: signalsParam,
+    });
+    try {
+      const res = await fetch(`/api/similar?${qs.toString()}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.origin) {
+        setSelectedProduct(data.origin);
+      }
+      if (data.results) {
+        setItems(data.results);
+      }
+      setCurrentPage(1);
+    } catch {
+      // ignore errors for now
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const initialId = paramId || "";
+    if (initialId) {
+      fetchSimilar(initialId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paramId]);
+
+  const related = useMemo(() => {
+    if (!selectedProduct) return [];
+    return items.filter((i) => i.id !== selectedProduct.id);
+  }, [items, selectedProduct]);
+  const sorted = useMemo(
+    () => (sortBy === "score" ? [...related].sort((a, b) => (b.similarity ?? 0) - (a.similarity ?? 0)) : [...related].sort((a, b) => a.title.localeCompare(b.title))),
+    [related, sortBy]
+  );
+  const perPage = topK;
+  const pageCount = Math.max(1, Math.ceil(sorted.length / perPage));
+  const paginated = sorted.slice((currentPage - 1) * perPage, currentPage * perPage);
+
+  useEffect(() => {
+    if (currentPage > pageCount) setCurrentPage(pageCount);
+  }, [pageCount, currentPage]);
+
+  const toggleSignal = (key: "title" | "description" | "category" | "image") => {
+    setSignals((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  // Si el modo es "Solo imagen", forzamos la señal de imagen a true para evitar confusión.
+  useEffect(() => {
+    if (mode === "Solo imagen" && !signals.image) {
+      setSignals((prev) => ({ ...prev, image: true }));
+    }
+  }, [mode, signals.image]);
+
+  useEffect(() => {
+    if (selectedProduct) {
+      fetchSimilar(selectedProduct.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, signals, topK]);
+
+  return (
+    <div className="min-h-screen bg-bg text-fg" suppressHydrationWarning>
+      <div className="mx-auto flex min-h-screen w-full max-w-screen-2xl flex-col gap-8 px-4 py-8 md:px-8 md:py-10">
+        <header className="flex flex-col gap-3">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-2 text-lg">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-primary">Recomendador · Detalle</p>
+              <h1 className="text-3xl font-semibold tracking-tight text-fg">“Ver productos similares a este”</h1>
+              <p className="text-lg text-muted">
+                Producto origen a la izquierda y sugerencias a la derecha.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-fg shadow-sm hover:bg-card-muted"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Volver a inicio
+              </Link>
+            </div>
+          </div>
+        </header>
+
+        <main className="grid flex-1 grid-cols-1 gap-6 xl:grid-cols-[380px_1fr]">
+          <section
+            className="rounded-3xl border border-border bg-card p-5 text-lg shadow-sm"
+          >
+            <p className="mt-2 text-md font-semibold uppercase text-primary">Producto origen</p>
+            <div className={`mt-4`}>
+              <div className="flex gap-4">
+                <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-xl bg-white text-[11px] text-slate-500">
+                  {selectedProduct?.image_url || selectedProduct?.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={selectedProduct.image_url || selectedProduct.image || ""} alt={selectedProduct.title} className="h-full w-full object-contain" />
+                  ) : (
+                    "Sin imagen"
+                  )}
+                </div>
+                <div className="flex-1 space-y-2">
+                  <p className="text-md font-semibold text-fg line-clamp-3">{selectedProduct?.title}</p>
+                  <p className="text-xs text-muted">{selectedProduct?.category}</p>
+                  <p
+                    className="text-xs text-muted"
+                    style={{ overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" }}
+                  >
+                    {selectedProduct?.description}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-5 space-y-3 rounded-2xl border border-dashed border-primary/30 bg-card-muted p-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-xs font-semibold uppercase tracking-wide text-primary">Modo de similitud</span>
+                <div className="inline-flex rounded-full border border-border px-1 py-1 text-xs bg-card">
+                  {(["Todo", "Solo texto", "Solo imagen"] as const).map((label) => (
+                    <button
+                      key={label}
+                      onClick={() => setMode(label)}
+                      className={`rounded-full px-3 py-1 transition ${
+                        mode === label ? "bg-primary text-white" : "text-fg hover:bg-card-muted"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 text-xs">
+                {mode !== "Solo imagen" && (
+                  <>
+                    <div className="font-semibold uppercase tracking-wide text-primary">Señales de texto</div>
+                    {(["title", "description", "category"] as const).map((key) => (
+                      <label key={key} className="inline-flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={signals[key]}
+                          onChange={() => toggleSignal(key)}
+                          className="h-3 w-3 rounded border border-border bg-card"
+                        />
+                        <span className="text-muted">{key === "title" ? "Título" : key === "description" ? "Descripción" : "Categoría"}</span>
+                      </label>
+                    ))}
+                  </>
+                )}
+                {mode !== "Solo texto" && mode !== "Solo imagen" && (
+                  <>
+                    <div className="font-semibold uppercase tracking-wide text-primary">Señal visual</div>
+                    <label className="inline-flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={signals.image}
+                        onChange={() => toggleSignal("image")}
+                        className="h-3 w-3 rounded border border-border bg-card"
+                      />
+                      <span className="text-muted">Imagen</span>
+                    </label>
+                  </>
+                )}
+              </div>
+            </div>
+          </section>
+
+          <section
+            className="rounded-3xl border border-border bg-card p-5 shadow-sm"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase text-primary">Sugeridos</p>
+                <p className="text-sm text-muted">Similares placeholder del dataset.</p>
+              </div>
+              <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">
+                Top‑{topK}
+              </span>
+            </div>
+            <section className="mt-4 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-3 text-xs">
+                <label className="flex items-center gap-2">
+                  <span className="text-muted">Top-K</span>
+                  <select
+                    value={topK}
+                    onChange={(e) => {
+                      setTopK(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="rounded-full border border-border bg-card px-3 py-1 text-fg"
+                  >
+                    {[12, 18, 24].map((k) => (
+                      <option key={k} value={k}>
+                        {k}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex items-center gap-2">
+                  <span className="text-muted">Ordenar por</span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as "score" | "title")}
+                    className="rounded-full border border-border bg-card px-3 py-1 text-fg"
+                  >
+                    <option value="score">Relevancia</option>
+                    <option value="title">Título</option>
+                  </select>
+                </label>
+              </div>
+            </section>
+            <div className="mt-4 relative">
+              {loading && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-bg/70 backdrop-blur-sm text-sm text-primary">
+                  Cargando similitudes…
+                </div>
+              )}
+              <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+                {paginated.map((item, idx) => (
+                  <button
+                    key={`${item.title}-${idx}`}
+                    onClick={() => {
+                      setSelectedProduct(item);
+                      setCurrentPage(1);
+                      fetchSimilar(item.id);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="flex flex-col rounded-2xl border border-border/70 bg-card-muted p-4 text-left transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
+                    style={{ minHeight: "320px" }}
+                  >
+                    <div className="flex h-40 items-center justify-center overflow-hidden rounded-xl bg-white text-[11px] text-slate-500">
+                      {item.image_url || item.image ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={item.image_url || item.image} alt={item.title} className="h-full w-full object-contain" />
+                      ) : (
+                        "Sin imagen"
+                      )}
+                    </div>
+                    <div className="mt-3 flex-1 space-y-1">
+                      <p className="text-lg font-semibold text-fg line-clamp-3" title={item.title}>
+                        {item.title}
+                      </p>
+                      <p
+                        className="text-md text-muted"
+                        style={{ overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}
+                        title={item.description}
+                      >
+                        {item.description}
+                      </p>
+                    </div>
+                    <div className="mt-3 flex items-center justify-between text-md">
+                      <span className="text-xs font-semibold uppercase text-primary">similitud</span>
+                      <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                        {item.similarity !== undefined
+                          ? item.similarity
+                          : Math.round(((item as { score?: number }).score ?? 0) * 100)}%
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center justify-between pt-4 text-sm text-muted">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-fg hover:bg-card-muted disabled:opacity-40"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Prev
+              </button>
+              <span>Página {currentPage} / {pageCount}</span>
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(pageCount, p + 1))}
+                disabled={currentPage >= pageCount}
+                className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-fg hover:bg-card-muted disabled:opacity-40"
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  );
+}

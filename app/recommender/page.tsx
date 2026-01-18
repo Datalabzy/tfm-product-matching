@@ -114,7 +114,7 @@ export default function RecommenderPage() {
 
   return (
     <div className="min-h-screen bg-bg text-fg" suppressHydrationWarning>
-      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-4 py-8 md:px-8 md:py-10">
+      <div className="mx-auto flex min-h-screen w-full max-w-screen-2xl flex-col gap-8 px-4 py-8 md:px-8 md:py-10">
         <header className="flex flex-col gap-4">
           <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
             <ArrowLeft className="h-4 w-4" />
@@ -191,12 +191,12 @@ export default function RecommenderPage() {
                   <div
                     className="grid justify-start gap-5"
                     style={{
-                      gridTemplateColumns: "repeat(auto-fill, minmax(260px, 320px))",
+                      gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
                     }}
                   >
                     {paginated.map((r, idx) => (
                       <Link
-                        href={`/studio/similar?productId=${encodeURIComponent(r.id)}`}
+                        href={`/similar?productId=${encodeURIComponent(r.id)}`}
                         key={`${r.title}-${idx}`}
                         className="flex flex-col rounded-2xl border border-border/70 bg-card-muted p-4 transition hover:-translate-y-0.5 hover:shadow-md hover:border-primary/30"
                         style={{ minHeight: "320px" }}
@@ -216,27 +216,29 @@ export default function RecommenderPage() {
                       </Link>
                     ))}
                   </div>
-                  <div className="flex items-center justify-between pt-4 text-sm text-muted">
-                    <button
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
-                      className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-fg hover:bg-card-muted disabled:opacity-40"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                      Prev
-                    </button>
-                    <span>
-                      Page {currentPage} / {pageCount}
-                    </span>
-                    <button
-                      onClick={() => setCurrentPage((p) => Math.min(pageCount, p + 1))}
-                      disabled={currentPage >= pageCount}
-                      className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-fg hover:bg-card-muted disabled:opacity-40"
-                    >
-                      Next
-                      <ChevronRight className="h-4 w-4" />
-                    </button>
-                  </div>
+                  {pageCount > 1 && (
+                    <div className="flex items-center justify-between pt-4 text-sm text-muted">
+                      <button
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-fg hover:bg-card-muted disabled:opacity-40"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                        Prev
+                      </button>
+                      <span>
+                        Page {currentPage} / {pageCount}
+                      </span>
+                      <button
+                        onClick={() => setCurrentPage((p) => Math.min(pageCount, p + 1))}
+                        disabled={currentPage >= pageCount}
+                        className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-fg hover:bg-card-muted disabled:opacity-40"
+                      >
+                        Next
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
                 </>
               )}
             </section>
