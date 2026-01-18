@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { Search, Repeat2, Link2, Sparkles } from "lucide-react";
+import { Search, Repeat2, Link2, Sparkles, Workflow } from "lucide-react";
 
 type LottieAnimation = { destroy?: () => void };
 type LottiePlayer = {
@@ -83,7 +83,7 @@ export default function Home() {
     <main className="bg-bg text-fg">
       <section className="mx-auto max-w-6xl px-6 py-14">
         {/* HERO */}
-        <div className="grid items-center gap-10 lg:grid-cols-2">
+        <div className="grid items-center gap-10 lg:grid-cols-2 pb-7">
           <div className="max-w-3xl">
             {/* TAG */}
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-primary/5 px-3 py-1 text-xs font-semibold text-fg">
@@ -125,7 +125,21 @@ export default function Home() {
         </div>
 
         {/* CASES */}
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+        <div className="mt-6 flex items-center gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-primary/15">
+            <Workflow className="h-5 w-5" />
+          </span>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+              Explore
+            </p>
+            <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+              Use cases
+            </h2>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-6 md:grid-cols-3">
           <CaseCard
             href="/studio/case1"
             icon={<Repeat2 className="h-5 w-5" />}

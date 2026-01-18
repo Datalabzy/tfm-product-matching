@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 export function SiteHeader() {
   return (
     <header className="border-b border-border bg-bg">
