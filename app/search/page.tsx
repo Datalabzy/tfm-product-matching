@@ -115,7 +115,7 @@ export default function SearchPage() {
   return (
     <div className="min-h-screen bg-bg text-fg" suppressHydrationWarning>
       <div className="mx-auto flex min-h-screen w-full max-w-screen-2xl flex-col gap-8 px-4 py-8 md:px-8 md:py-10">
-        <header className="flex flex-col gap-4">
+        <header className="flex flex-col gap-6">
           <div className="flex flex-wrap items-center gap-3 text-sm font-semibold text-primary">
             <Link href="/" className="inline-flex items-center gap-2 hover:underline">
               <ArrowLeft className="h-4 w-4" />
@@ -134,9 +134,6 @@ export default function SearchPage() {
               <p className="max-w-3xl text-base leading-relaxed text-muted">
                 Free-text queries ranked by embedding similarity across your catalog.
               </p>
-            </div>
-            <div className="rounded-2xl border border-border/80 bg-card-muted px-4 py-3 text-xs font-semibold text-primary shadow-sm">
-              Top‑K retrieval · cosine similarity
             </div>
           </div>
         </header>
@@ -168,7 +165,7 @@ export default function SearchPage() {
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-hover disabled:opacity-60"
                 >
                   <SearchIcon className="h-4 w-4" />
-                  {loading ? "Searching..." : "Run search"}
+                  Search
                 </button>
                 <button
                   onClick={() => setQuery("")}
