@@ -114,7 +114,7 @@ export default function RecommenderPage() {
 
   return (
     <div className="min-h-screen bg-bg text-fg" suppressHydrationWarning>
-      <div className="mx-auto flex min-h-screen w-full max-w-screen-2xl flex-col gap-8 px-4 py-8 md:px-8 md:py-10">
+      <div className="mx-auto flex min-h-screen w-full max-w-none flex-col gap-8 px-4 py-8 md:px-8 md:py-10">
         <header className="flex flex-col gap-4">
           <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
             <ArrowLeft className="h-4 w-4" />

@@ -98,7 +98,7 @@ export default function SimilarPage() {
 
   return (
     <div className="min-h-screen bg-bg text-fg" suppressHydrationWarning>
-      <div className="mx-auto flex min-h-screen w-full max-w-screen-2xl flex-col gap-8 px-4 py-8 md:px-8 md:py-10">
+      <div className="mx-auto flex min-h-screen w-full max-w-none flex-col gap-8 px-4 py-8 md:px-8 md:py-10">
         <header className="flex flex-col gap-3">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2 text-lg">
@@ -294,25 +294,29 @@ export default function SimilarPage() {
                 ))}
               </div>
             </div>
-            <div className="flex items-center justify-between pt-4 text-sm text-muted">
-              <button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-fg hover:bg-card-muted disabled:opacity-40"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Prev
-              </button>
-              <span>Página {currentPage} / {pageCount}</span>
-              <button
-                onClick={() => setCurrentPage((p) => Math.min(pageCount, p + 1))}
-                disabled={currentPage >= pageCount}
-                className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-fg hover:bg-card-muted disabled:opacity-40"
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
+            {pageCount > 1 && (
+              <div className="flex items-center justify-between pt-4 text-sm text-muted">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-fg hover:bg-card-muted disabled:opacity-40"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Prev
+                </button>
+                <span>
+                  Página {currentPage} / {pageCount}
+                </span>
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(pageCount, p + 1))}
+                  disabled={currentPage >= pageCount}
+                  className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-fg hover:bg-card-muted disabled:opacity-40"
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            )}
           </section>
         </main>
       </div>

@@ -86,7 +86,7 @@ export default function Home() {
         <div className="grid items-center gap-10 lg:grid-cols-2 pb-7">
           <div className="max-w-3xl">
             {/* TAG */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-primary/5 px-3 py-1 text-xs font-semibold text-fg">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs font-semibold text-fg">
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-full text-primary">
                 <Sparkles className="h-3 w-3" />
               </span>
