@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Repeat2 } from "lucide-react";
 
 type Result = { id: string; title: string; description: string; image_url?: string; image?: string; similarity?: number };
 
@@ -13,7 +13,7 @@ export default function RecommenderPage() {
   const [selectedProduct, setSelectedProduct] = useState<Result | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [topK, setTopK] = useState(12);
+  const [topK, setTopK] = useState(50);
   const [mode, setMode] = useState<"Todo" | "Solo texto" | "Solo imagen">("Todo");
   const [sortBy, setSortBy] = useState<"score" | "title">("score");
   const [signals, setSignals] = useState<{ title: boolean; description: boolean; category: boolean; image: boolean }>({
@@ -126,8 +126,10 @@ export default function RecommenderPage() {
           </div>
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2 text-lg">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-primary">Case 2 · Recommender</p>
-              <h1 className="text-3xl font-semibold tracking-tight text-fg">Product recommender (similar items)</h1>
+              <h1 className="inline-flex items-center gap-2 text-3xl font-semibold tracking-tight text-fg">
+                <Repeat2 className="h-6 w-6 text-primary" />
+                Product recommender
+              </h1>
               <p className="text-lg text-muted">Choose an origin product and see the closest items by similarity.</p>
             </div>
           </div>
@@ -214,7 +216,12 @@ export default function RecommenderPage() {
                 <p className="text-xs font-semibold uppercase text-primary">Suggestions</p>
                 <p className="text-sm text-muted">Similar items ranked by embeddings.</p>
               </div>
-              <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">Top‑{topK}</span>
+              <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold text-primary">
+                <span className="rounded-full bg-primary/10 px-3 py-1">Top‑{topK}</span>
+                <span className="rounded-full bg-primary/10 px-3 py-1 capitalize">
+                  {sortBy === "score" ? "Relevance" : "Title"}
+                </span>
+              </div>
             </div>
             <section className="mt-4 flex flex-wrap items-center justify-between gap-4">
               <div className="flex flex-wrap items-center gap-3 text-xs">
@@ -228,7 +235,7 @@ export default function RecommenderPage() {
                     }}
                     className="rounded-full border border-border bg-card px-3 py-1 text-fg"
                   >
-                    {[12, 18, 24].map((k) => (
+                    {[12, 24, 50, 75].map((k) => (
                       <option key={k} value={k}>
                         {k}
                       </option>
@@ -251,21 +258,17 @@ export default function RecommenderPage() {
             <div className="relative mt-4">
               {loading && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-bg/70 backdrop-blur-sm text-sm text-primary">
-                  Loading similar items…
+                  Loading similar items...
                 </div>
               )}
               <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
                 {paginated.map((item, idx) => (
-                  <button
+                  <Link
                     key={`${item.title}-${idx}`}
-                    onClick={() => {
-                      setSelectedProduct(item);
-                      setCurrentPage(1);
-                      fetchSimilar(item.id);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
+                    href={`/recommender?productId=${encodeURIComponent(item.id)}`}
                     className="flex flex-col rounded-2xl border border-border/70 bg-card-muted p-4 text-left transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
                     style={{ minHeight: "320px" }}
+                    aria-label={`View similar items to ${item.title}`}
                   >
                     <div className="flex h-40 items-center justify-center overflow-hidden rounded-xl bg-white text-[11px] text-slate-500">
                       {item.image_url || item.image ? (
@@ -293,7 +296,7 @@ export default function RecommenderPage() {
                         {item.similarity !== undefined ? item.similarity : Math.round(((item as { score?: number }).score ?? 0) * 100)}%
                       </span>
                     </div>
-                  </button>
+                  </Link>
                 ))}
               </div>
             </div>

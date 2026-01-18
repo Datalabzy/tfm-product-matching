@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ChevronLeft, ChevronRight, Sparkles, Search as SearchIcon } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Search as SearchIcon } from "lucide-react";
 
 type Result = { id: string; title: string; description: string; image_url?: string; image?: string };
 type LottieAnimation = { destroy?: () => void };
@@ -126,11 +126,10 @@ export default function SearchPage() {
           </div>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-primary/5 px-3 py-1 text-xs font-semibold text-fg">
-                <Sparkles className="h-4 w-4 text-primary" />
-                Case 1 · Search
-              </div>
-              <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Semantic search</h1>
+              <h1 className="inline-flex items-center gap-2 text-3xl font-semibold tracking-tight md:text-4xl">
+                <SearchIcon className="h-6 w-6 text-primary" />
+                Semantic search
+              </h1>
               <p className="max-w-3xl text-base leading-relaxed text-muted">
                 Free-text queries ranked by embedding similarity across your catalog.
               </p>
@@ -141,10 +140,6 @@ export default function SearchPage() {
         <main className="flex-1 rounded-3xl border border-border bg-card p-5 shadow-sm md:p-6">
           <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
             <aside className="space-y-4 rounded-2xl border border-border/80 bg-card-muted p-5">
-              <div className="flex items-center gap-2 text-sm font-semibold text-muted">
-                <SearchIcon className="h-4 w-4" />
-                Query
-              </div>
               <div className="flex items-center gap-3 rounded-2xl border border-border/80 bg-white px-4 py-3">
                 <span className="text-primary">
                   <SearchIcon className="h-4 w-4" />
@@ -164,7 +159,6 @@ export default function SearchPage() {
                   disabled={loading}
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-hover disabled:opacity-60"
                 >
-                  <SearchIcon className="h-4 w-4" />
                   Search
                 </button>
                 <button

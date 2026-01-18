@@ -20,6 +20,15 @@ const DATA_FILE = path.join(process.cwd(), "data", "products.jsonl");
 const VECTOR_SIZE = 256;
 let cache: DataCache | null = null;
 
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
+}
+
 function hashToken(token: string): number {
   let h = 0;
   for (let i = 0; i < token.length; i++) {
@@ -59,8 +68,8 @@ function parseJsonl(filePath: string): Product[] {
     arr
       .map((obj, idx) => ({
         id: obj?.id?.toString() ?? `prod-${idx}`,
-        title: obj?.title ?? "",
-        description: obj?.description ?? "",
+        title: decodeHtmlEntities(obj?.title ?? ""),
+        description: decodeHtmlEntities(obj?.description ?? ""),
         image: obj?.image ?? obj?.image_url ?? "",
         image_url: obj?.image_url ?? obj?.image ?? "",
         category_path: obj?.category_path ?? "",
@@ -81,8 +90,8 @@ function parseJsonl(filePath: string): Product[] {
         const obj = JSON.parse(line);
         return {
           id: obj?.id?.toString() ?? `prod-${idx}`,
-          title: obj?.title ?? "",
-          description: obj?.description ?? "",
+          title: decodeHtmlEntities(obj?.title ?? ""),
+          description: decodeHtmlEntities(obj?.description ?? ""),
           image: obj?.image ?? obj?.image_url ?? "",
           image_url: obj?.image_url ?? obj?.image ?? "",
           category_path: obj?.category_path ?? "",

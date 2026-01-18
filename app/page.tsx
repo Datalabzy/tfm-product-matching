@@ -114,7 +114,7 @@ export default function Home() {
           </div>
 
           {/* ANIMATION */}
-          <div className="relative hidden h-64 w-full overflow-hidden rounded-3xl border border-border/70 bg-primary/5 shadow-sm md:block md:h-72">
+          <div className="relative hidden h-64 w-full overflow-hidden rounded-3xl md:block md:h-72">
             <div className="pointer-events-none absolute inset-0 from-transparent to-black/5" />
             <div
               ref={lottieRef}
