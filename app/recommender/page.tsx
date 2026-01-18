@@ -114,12 +114,18 @@ export default function RecommenderPage() {
 
   return (
     <div className="min-h-screen bg-bg text-fg" suppressHydrationWarning>
-      <div className="mx-auto flex min-h-screen w-full max-w-none flex-col gap-8 px-4 py-8 md:px-8 md:py-10">
+      <div className="mx-auto flex min-h-screen w-full max-w-screen-2xl flex-col gap-8 px-4 py-8 md:px-8 md:py-10">
         <header className="flex flex-col gap-4">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
-            <ArrowLeft className="h-4 w-4" />
-            Back to home
-          </Link>
+          <div className="flex flex-wrap items-center gap-3 text-sm font-semibold text-primary">
+            <Link href="/" className="inline-flex items-center gap-2 hover:underline">
+              <ArrowLeft className="h-4 w-4" />
+              Home
+            </Link>
+            <span className="text-muted">/</span>
+            <Link href="/#cases" className="hover:underline">
+              Cases
+            </Link>
+          </div>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 rounded-full border border-border bg-primary/5 px-3 py-1 text-xs font-semibold text-fg">

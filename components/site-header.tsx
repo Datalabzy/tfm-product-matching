@@ -1,7 +1,7 @@
 export function SiteHeader() {
   return (
     <header className="border-b border-border bg-bg">
-      <div className="mx-auto flex max-w-screen-2xl flex-wrap items-center gap-4 px-4 py-4 sm:px-6 sm:py-5 md:gap-6">
+      <div className="mx-auto flex w-full max-w-screen-2xl flex-wrap items-center gap-4 px-4 py-4 sm:px-6 sm:py-5 md:gap-6">
         <div className="flex flex-1 items-center gap-3 min-w-0">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-sm font-semibold text-white shrink-0">
             TFM

@@ -81,7 +81,7 @@ export default function Home() {
 
   return (
     <main className="bg-bg text-fg">
-      <section className="mx-auto max-w-6xl px-6 py-14">
+      <section className="mx-auto w-full max-w-screen-2xl px-6 py-14">
         {/* HERO */}
         <div className="grid items-center gap-10 lg:grid-cols-2 pb-7">
           <div className="max-w-3xl">
