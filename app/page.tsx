@@ -141,8 +141,8 @@ export default function Home() {
 
         <div className="mt-6 grid gap-6 md:grid-cols-3">
           <CaseCard
-            href="/recommender"
-            icon={<Repeat2 className="h-5 w-5" />}
+            href="/search"
+            icon={<Search className="h-5 w-5" />}
             tag="Case 1"
             title="Semantic search"
             desc="Free-text queries ranked by embedding similarity."
@@ -150,10 +150,10 @@ export default function Home() {
           />
 
           <CaseCard
-            href="/similar"
-            icon={<Search className="h-5 w-5" />}
+            href="/recommender"
+            icon={<Repeat2 className="h-5 w-5" />}
             tag="Case 2"
-            title="Similar products"
+            title="Product recommender"
             desc="Item-to-item recommendations based on vector similarity."
             cta="Go to Case 2 →"
           />
