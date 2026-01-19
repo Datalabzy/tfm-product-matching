@@ -64,17 +64,26 @@ function parseJsonl(filePath: string): Product[] {
   const raw = fs.readFileSync(filePath, "utf-8").trim();
   if (!raw) return [];
 
-  const mapArr = (arr: unknown[]) =>
-    arr
-      .map((obj, idx) => ({
-        id: obj?.id?.toString() ?? `prod-${idx}`,
-        title: decodeHtmlEntities(obj?.title ?? ""),
-        description: decodeHtmlEntities(obj?.description ?? ""),
-        image: obj?.image ?? obj?.image_url ?? "",
-        image_url: obj?.image_url ?? obj?.image ?? "",
-        category_path: obj?.category_path ?? "",
-      }))
-      .filter((p) => p.title || p.description);
+  const mapArr = (arr: unknown[]): Product[] =>
+    arr.flatMap((obj, idx) => {
+      if (!obj || typeof obj !== "object") return [];
+      const rec = obj as Record<string, unknown>;
+      const title = typeof rec.title === "string" ? rec.title : "";
+      const description = typeof rec.description === "string" ? rec.description : "";
+      const image = typeof rec.image === "string" ? rec.image : "";
+      const image_url = typeof rec.image_url === "string" ? rec.image_url : "";
+      const id = rec.id !== undefined ? String(rec.id) : `prod-${idx}`;
+
+      const product: Product = {
+        id,
+        title: decodeHtmlEntities(title),
+        description: decodeHtmlEntities(description),
+        image: image || image_url,
+        image_url: image_url || image,
+      };
+
+      return product.title || product.description ? [product] : [];
+    });
 
   // Supports JSON array
   if (raw.startsWith("[")) {
@@ -94,13 +103,12 @@ function parseJsonl(filePath: string): Product[] {
           description: decodeHtmlEntities(obj?.description ?? ""),
           image: obj?.image ?? obj?.image_url ?? "",
           image_url: obj?.image_url ?? obj?.image ?? "",
-          category_path: obj?.category_path ?? "",
         } as Product;
       } catch {
         return null;
       }
     })
-    .filter(Boolean) as Product[];
+    .filter((p): p is Product => Boolean(p && (p.title || p.description)));
 
   // Some dumps come concatenated without newlines: {...}{...}
   if (parsed.length <= 1 && raw.includes("}{")) {

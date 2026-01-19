@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeft, ChevronLeft, ChevronRight, Repeat2 } from "lucide-react";
 
-type Result = { id: string; title: string; description: string; image_url?: string; image?: string; similarity?: number };
+type Result = { id: string; title: string; description: string; image_url?: string; image?: string; similarity?: number; category_path?: string };
 
-export default function RecommenderPage() {
+function RecommenderContent() {
   const params = useSearchParams();
   const [items, setItems] = useState<Result[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Result | null>(null);
@@ -150,7 +150,7 @@ export default function RecommenderPage() {
                 </div>
                 <div className="flex-1 space-y-2">
                   <p className="text-md font-semibold text-fg line-clamp-3">{selectedProduct?.title}</p>
-                  <p className="text-xs text-muted">{selectedProduct?.category}</p>
+                  <p className="text-xs text-muted">{selectedProduct?.category_path}</p>
                   <p
                     className="text-xs text-muted"
                     style={{ overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" }}
@@ -327,5 +327,13 @@ export default function RecommenderPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function RecommenderPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-bg text-fg px-6 py-12">Loading recommender…</div>}>
+      <RecommenderContent />
+    </Suspense>
   );
 }
