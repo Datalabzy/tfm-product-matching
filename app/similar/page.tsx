@@ -218,35 +218,20 @@ function SmartConnectionsContent() {
             <span className="text-muted font-normal">Smart Connections</span>
           </div>
 
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-2">
-              <h1 className="inline-flex items-center gap-2 text-3xl font-semibold tracking-tight">
-                <Link2 className="h-6 w-6 text-primary" />
-                Smart Connections (1→N)
-              </h1>
-              <p className="text-lg text-muted">
-                Pick the best competitor equivalent for a client product. Includes thresholding and manual validation.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  setSelectedMatchId(null);
-                  setDiscardedIds(new Set());
-                }}
-                className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold hover:bg-card-muted"
-              >
-                <RefreshCw className="h-4 w-4" />
-                Reset
-              </button>
-            </div>
+          <div className="space-y-2">
+            <h1 className="inline-flex items-center gap-2 text-3xl font-semibold tracking-tight">
+              <Link2 className="h-6 w-6 text-primary" />
+              Smart Connections (1→N)
+            </h1>
+            <p className="text-lg text-muted">
+              Pick the best competitor equivalent for a client product. Includes thresholding and manual validation.
+            </p>
           </div>
         </header>
 
-        <main className="grid flex-1 grid-cols-1 gap-6 xl:grid-cols-[460px_1fr]">
+        <main className="grid flex-1 grid-cols-1 gap-6 xl:grid-cols-[420px_1fr]">
           {/* LEFT: Catálogo y origen */}
-          <section className="rounded-3xl border border-border bg-card p-5 shadow-sm space-y-6">
+          <section className="rounded-3xl border border-border bg-card p-5 shadow-sm space-y-6 md:sticky md:top-24 self-start max-h-[calc(100vh-140px)] overflow-auto">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-primary">Catálogo cliente</p>
               <div className="mt-3 flex items-center justify-between text-xs text-muted">
@@ -281,7 +266,7 @@ function SmartConnectionsContent() {
                     onClick={() => fetchConnections(c.id)}
                     className={`flex flex-col items-start gap-2 rounded-2xl border px-3 py-3 text-left transition ${
                       origin?.id === c.id
-                        ? "border-primary bg-primary/5 shadow-sm"
+                        ? "border-primary bg-white shadow-sm ring-2 ring-primary/25"
                         : "border-border bg-card-muted hover:border-primary/40"
                     }`}
                   >
@@ -294,90 +279,39 @@ function SmartConnectionsContent() {
                 ))}
               </div>
             </div>
+          </section>
 
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-primary">Client product seleccionado</p>
-
-              <div className="mt-4 flex gap-4">
-                <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-xl border border-border bg-card-muted text-[11px] text-slate-500">
-                  {origin?.image_url || origin?.image ? renderImage(origin.image_url || origin.image, origin.title) : "No image"}
-                </div>
-
-                <div className="flex-1 space-y-2">
-                  <p className="text-md font-semibold text-fg line-clamp-3">{origin?.title ?? "Selecciona un producto"}</p>
-                  <p className="text-xs text-muted">{origin?.category_path}</p>
-                  <p className="text-xs text-muted line-clamp-3">{origin?.description}</p>
-
-                  <div className="flex flex-wrap gap-2 pt-1 text-xs">
-                    {origin?.brand && (
-                      <span className="rounded-full border border-border bg-card-muted px-3 py-1 text-muted">
-                        brand: {origin.brand}
-                      </span>
-                    )}
-                    {typeof origin?.price === "number" && (
-                      <span className="rounded-full border border-border bg-card-muted px-3 py-1 text-muted">
-                        price: {origin.price}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Controls */}
-            <div className="space-y-3 rounded-2xl border border-dashed border-primary/30 bg-card-muted p-3">
-              <div className="flex items-center gap-2">
-                <SlidersHorizontal className="h-4 w-4 text-primary" />
-                <span className="text-xs font-semibold uppercase tracking-wide text-primary">Controls</span>
+          {/* RIGHT: Candidate list */}
+          <section className="rounded-3xl border border-border bg-card p-5 shadow-sm space-y-4">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold uppercase text-primary">Competitor candidates</p>
               </div>
 
-              <div className="grid gap-3 text-sm">
-                <label className="flex items-center justify-between gap-3">
-                  <span className="text-muted">Top-K</span>
-                  <select
-                    value={topK}
-                    onChange={(e) => setTopK(Number(e.target.value))}
-                    className="rounded-full border border-border bg-card px-3 py-1 text-fg"
-                  >
-                    {[10, 25, 50, 100].map((k) => (
-                      <option key={k} value={k}>
-                        {k}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label className="grid gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted">Threshold</span>
-                    <span className="text-xs font-semibold text-primary">{threshold}%</span>
-                  </div>
+              <div className="flex flex-wrap items-center gap-3 text-xs">
+                <label className="flex items-center gap-2">
+                  <span className="text-muted">Threshold</span>
+                  <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">{threshold}%</span>
                   <input
                     type="range"
                     min={0}
                     max={100}
                     value={threshold}
                     onChange={(e) => setThreshold(Number(e.target.value))}
-                    className="w-full"
                   />
-                  <p className="text-xs text-muted">
-                    Shows active candidates with score ≥ threshold. Toggle “Show discarded” to review excluded ones.
-                  </p>
                 </label>
-
-                <label className="flex items-center justify-between gap-3">
+                <label className="flex items-center gap-2">
                   <span className="text-muted">Sort</span>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as "score" | "title")}
-                    className="rounded-full border border-border bg-card px-3 py-1 text-fg"
+                    className="rounded-full border border-border bg-card px-3 py-1 text-fg text-xs"
                   >
                     <option value="score">Relevance</option>
                     <option value="title">Title</option>
                   </select>
                 </label>
-
-                <label className="inline-flex items-center gap-2 text-sm">
+                <label className="inline-flex items-center gap-2">
                   <input
                     type="checkbox"
                     checked={showDiscarded}
@@ -386,50 +320,33 @@ function SmartConnectionsContent() {
                   />
                   <span className="text-muted">Show discarded</span>
                 </label>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="grid gap-2">
-              <button
-                disabled={!selectedMatchId}
-                onClick={confirmMatch}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white disabled:opacity-40"
-              >
-                <CheckCircle2 className="h-4 w-4" />
-                Confirm match
-              </button>
-
-              <button
-                onClick={markNoMatch}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold hover:bg-card-muted"
-              >
-                <XCircle className="h-4 w-4 text-primary" />
-                Mark as no-match
-              </button>
-
-              <p className="text-xs text-muted">
-                Tip: confirm one selected competitor item. If none is correct, mark as no-match.
-              </p>
-            </div>
-          </section>
-
-          {/* RIGHT: Candidate list */}
-          <section className="rounded-3xl border border-border bg-card p-5 shadow-sm">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase text-primary">Competitor candidates</p>
-                <p className="text-sm text-muted">Select exactly one candidate as the final match.</p>
-              </div>
-
-              <div className="text-[11px] font-semibold text-primary">
-                <span className="rounded-full bg-primary/10 px-3 py-1">
+                <span className="rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary">
                   showing {visibleCandidates.length}
                 </span>
               </div>
             </div>
 
-            <div className="relative mt-4">
+            {origin && (
+              <div className="rounded-2xl border-2 border-primary/40 bg-gradient-to-r from-primary/10 via-card to-card p-4 text-sm shadow-sm">
+                <p className="text-xs uppercase font-semibold text-primary">Cliente activo</p>
+                <div className="mt-3 flex items-center gap-4">
+                  <div className="h-20 w-20 overflow-hidden rounded-xl border border-border bg-white">
+                    {origin.image_url || origin.image ? renderImage(origin.image_url || origin.image, origin.title) : "No image"}
+                  </div>
+                  <div className="min-w-0 space-y-1">
+                    <p className="text-base font-semibold leading-tight line-clamp-2">{origin.title}</p>
+                    <p className="text-xs text-muted line-clamp-1">{origin.category_path}</p>
+                  </div>
+                  {selectedMatchId && (
+                    <span className="ml-auto rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                      Match selected
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="relative">
               {loading && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-bg/70 backdrop-blur-sm text-sm text-primary">
                   Loading candidates...
@@ -446,7 +363,7 @@ function SmartConnectionsContent() {
                       key={`${c.id}-${idx}`}
                       className={`rounded-2xl border p-4 transition ${
                         selectedMatchId === c.id
-                          ? "border-primary/60 bg-primary/5 shadow-sm"
+                          ? "border-primary/70 bg-primary/5 shadow-sm ring-1 ring-primary/30"
                           : "border-border/70 bg-card-muted hover:border-primary/30 hover:shadow-sm"
                       } ${isDiscarded ? "opacity-60" : ""}`}
                     >
