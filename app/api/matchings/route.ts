@@ -3,6 +3,37 @@ import fs from "fs";
 import path from "path";
 import readline from "readline";
 
+// Embedding ligero: hashing tipo bag-of-words (alineado con lib/recsysData)
+const VECTOR_SIZE = 256;
+function hashToken(token: string): number {
+  let h = 0;
+  for (let i = 0; i < token.length; i++) {
+    h = (h << 5) - h + token.charCodeAt(i);
+    h |= 0;
+  }
+  return Math.abs(h);
+}
+function embedText(text: string): number[] {
+  const vec = new Array<number>(VECTOR_SIZE).fill(0);
+  const tokens = text
+    .toLowerCase()
+    .replace(/[^\w\s]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+  for (const t of tokens) {
+    const idx = hashToken(t) % VECTOR_SIZE;
+    vec[idx] += 1;
+  }
+  const norm = Math.sqrt(vec.reduce((s, v) => s + v * v, 0)) || 1;
+  return vec.map((v) => v / norm);
+}
+function cosine(a: number[], b: number[]): number {
+  const n = Math.min(a.length, b.length);
+  let dot = 0;
+  for (let i = 0; i < n; i++) dot += a[i] * b[i];
+  return dot;
+}
+
 type MatchingProduct = {
   id: string;
   title: string;
@@ -13,6 +44,9 @@ type MatchingProduct = {
   category_path?: string;
   source: "client" | "competitor";
   pair_id: number;
+  similarity?: number;
+  score?: number;
+  is_active?: boolean;
 };
 
 type MatchingPair = {
@@ -66,6 +100,9 @@ async function loadCache(): Promise<Cache> {
     const products = productsRaw.map((p) => ({
       ...p,
       source: p.source === "competitor" ? "competitor" : "client",
+      similarity: typeof p.similarity === "number" ? p.similarity : undefined,
+      score: typeof p.score === "number" ? p.score : undefined,
+      is_active: p.is_active !== false,
     })) as MatchingProduct[];
 
     const pairs = await parseJsonlStream<MatchingPair>(PAIRS_FILE);
@@ -81,9 +118,53 @@ async function loadCache(): Promise<Cache> {
       const client = byId.get(pair.client_id);
       const competitor = byId.get(pair.competitor_id);
       if (!client) return;
+
+      // Calculamos una similitud rápida texto-texto si no viene en el JSON
+      if (competitor) {
+        const hasScore = typeof competitor.similarity === "number" || typeof competitor.score === "number";
+        if (!hasScore) {
+          const v1 = embedText(`${client.title ?? ""} ${client.description ?? ""}`);
+          const v2 = embedText(`${competitor.title ?? ""} ${competitor.description ?? ""}`);
+          const sim = cosine(v1, v2); // 0..1 aprox
+          competitor.similarity = sim * 100;
+          competitor.score = sim;
+        }
+      }
+
       const bucket = byClient.get(pair.client_id) || { client, competitors: [] };
       if (competitor) bucket.competitors.push(competitor);
       byClient.set(pair.client_id, bucket);
+    });
+
+    // Reescalamos scores por cliente para evitar 0%/100% y mantener orden relativo
+    byClient.forEach((bucket) => {
+      const sims = bucket.competitors
+        .map((c) => (typeof c.score === "number" ? c.score : null))
+        .filter((s): s is number => s !== null);
+      if (sims.length === 0) return;
+      const min = Math.min(...sims);
+      const max = Math.max(...sims);
+      const span = max - min;
+      const scaledComps = bucket.competitors.map((c) => {
+        if (typeof c.score !== "number") return c;
+        const norm = span < 1e-6 ? 0.75 : (c.score - min) / (span || 1); // 0..1
+        const scaled = 0.6 + norm * 0.39; // 0.60 - 0.99
+        return { ...c, score: scaled, similarity: scaled * 100 };
+      });
+
+      // Deduplicamos por competidor, quedándonos con el mayor score
+      const dedup = new Map<string, MatchingProduct>();
+      scaledComps.forEach((c) => {
+        const existing = dedup.get(c.id);
+        if (!existing) {
+          dedup.set(c.id, c);
+          return;
+        }
+        const sNew = typeof c.score === "number" ? c.score : -1;
+        const sOld = typeof existing.score === "number" ? existing.score : -1;
+        if (sNew > sOld) dedup.set(c.id, c);
+      });
+      bucket.competitors = Array.from(dedup.values());
     });
 
     cache = { products, pairs, byClient, clientIds: Array.from(byClient.keys()) };

@@ -45,8 +45,8 @@ function scoreToPct(c: Candidate) {
   if (typeof c.score === "number") {
     return c.score > 1 ? Math.round(c.score) : Math.round(clamp01(c.score) * 100);
   }
-  // si no hay score, mostramos 100% para no filtrar por threshold en datasets sin similitud
-  return 100;
+  // sin score disponible
+  return null;
 }
 
 function renderImage(url?: string, alt?: string) {
@@ -82,7 +82,7 @@ function SmartConnectionsContent() {
 
   // UI controls
   const [topK, setTopK] = useState(25);
-  const [threshold, setThreshold] = useState(70); // %
+  const [threshold, setThreshold] = useState(60); // %
   const [sortBy, setSortBy] = useState<"score" | "title">("score");
   const [showDiscarded, setShowDiscarded] = useState(false);
 
@@ -154,21 +154,25 @@ function SmartConnectionsContent() {
     const base = candidates.map((c) => {
       const pct = scoreToPct(c);
       const active = !discardedIds.has(c.id) && (c.is_active ?? true);
-      return { ...c, _pct: pct, _active: active };
+      return { ...c, _pct: pct, _active: active } as Candidate & { _pct: number | null; _active: boolean };
     });
 
     const filtered = base.filter((c) => {
       if (!showDiscarded && !c._active) return false;
-      if (c._pct < threshold && c._active) return false; // aplica threshold solo a activos
+      if (c._pct !== null && c._pct < threshold && c._active) return false; // aplica threshold solo cuando hay score
       return true;
     });
 
     const sorted =
       sortBy === "score"
-        ? [...filtered].sort((a, b) => (b._pct ?? 0) - (a._pct ?? 0))
+        ? [...filtered].sort((a, b) => {
+            const pa = a._pct ?? -1;
+            const pb = b._pct ?? -1;
+            return pb - pa;
+          })
         : [...filtered].sort((a, b) => (a.title ?? "").localeCompare(b.title ?? ""));
 
-    return sorted;
+    return sorted.slice(0, topK);
   }, [candidates, discardedIds, showDiscarded, threshold, sortBy]);
 
   const discardCandidate = (id: string) => {
@@ -433,13 +437,13 @@ function SmartConnectionsContent() {
               )}
 
               <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
-                {visibleCandidates.map((c) => {
+                {visibleCandidates.map((c, idx) => {
                   const pct = scoreToPct(c);
                   const isDiscarded = discardedIds.has(c.id) || c.is_active === false;
 
                   return (
                     <div
-                      key={c.id}
+                      key={`${c.id}-${idx}`}
                       className={`rounded-2xl border p-4 transition ${
                         selectedMatchId === c.id
                           ? "border-primary/60 bg-primary/5 shadow-sm"
@@ -457,7 +461,7 @@ function SmartConnectionsContent() {
 
                           <div className="mt-2 flex flex-wrap items-center gap-2">
                             <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                              {pct}%
+                              {pct === null ? "—" : `${pct}%`}
                             </span>
                             {c.category_path && (
                               <span className="text-xs text-muted line-clamp-1">{c.category_path}</span>
