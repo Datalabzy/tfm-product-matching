@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft, Check, Save } from "lucide-react";
 import Link from "next/link";
@@ -15,7 +15,7 @@ type Product = {
   brand?: string;
 };
 
-export default function EvalPage() {
+function EvalContent() {
   const params = useSearchParams();
   const router = useRouter();
   const seedParam = params.get("seed") || params.get("user") || "1";
@@ -152,5 +152,13 @@ export default function EvalPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function EvalPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-muted">Cargando evaluación…</div>}>
+      <EvalContent />
+    </Suspense>
   );
 }
