@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { ArrowLeft, Check } from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { ArrowLeft, Check, Save } from "lucide-react";
 import Link from "next/link";
 
 type Product = {
@@ -17,10 +17,14 @@ type Product = {
 
 export default function EvalPage() {
   const params = useSearchParams();
+  const router = useRouter();
   const seedParam = params.get("seed") || params.get("user") || "1";
+  const REQUIRED = 3;
   const [base, setBase] = useState<Product | null>(null);
   const [cands, setCands] = useState<Product[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [saving, setSaving] = useState(false);
+  const total = cands.length || 0;
 
   const fetchSet = async (seed: string) => {
     setSelected(new Set());
@@ -44,6 +48,23 @@ export default function EvalPage() {
     });
   };
 
+  const submit = async () => {
+    if (!base || selected.size < REQUIRED) return;
+    setSaving(true);
+    try {
+      await fetch("/api/eval-set", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ seed: seedParam, base_id: base.id, selected_ids: Array.from(selected) }),
+      });
+      // avanzar a la siguiente semilla para agilizar paneles
+      const nextSeed = String((Number(seedParam) || 0) + 1);
+      router.push(`/eval?seed=${encodeURIComponent(nextSeed)}`);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-bg text-fg" suppressHydrationWarning>
       <div className="mx-auto flex w-full max-w-screen-xl flex-col gap-6 px-4 py-8 md:px-8 md:py-10">
@@ -57,14 +78,16 @@ export default function EvalPage() {
 
         <header className="space-y-2">
           <h1 className="text-3xl font-semibold tracking-tight">Human eval</h1>
-          <p className="text-muted">Selecciona los 5 candidatos que más se parezcan al producto base. Semilla: {seedParam}</p>
+          <p className="text-muted">
+            Selecciona {REQUIRED} candidatos (de {total || "…"}) que más se parezcan al producto base. Semilla: {seedParam}
+          </p>
         </header>
 
         {base && (
-          <div className="rounded-3xl border border-border bg-card p-4 shadow-sm">
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
             <p className="text-xs font-semibold uppercase text-primary">Producto base</p>
-            <div className="mt-3 flex gap-3">
-              <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-xl bg-white text-[11px] text-muted">
+            <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-center">
+              <div className="flex h-64 w-full md:w-80 items-center justify-center overflow-hidden rounded-2xl from-white to-primary/5 text-[11px] text-muted shadow-inner border border-border/60">
                 {base.image_url || base.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={base.image_url || base.image} alt={base.title} className="h-full w-full object-contain" />
@@ -72,16 +95,16 @@ export default function EvalPage() {
                   "No image"
                 )}
               </div>
-              <div className="space-y-1">
-                <p className="text-lg font-semibold">{base.title}</p>
-                <p className="text-sm text-muted line-clamp-2">{base.description}</p>
+              <div className="space-y-3 md:flex-1">
+                <p className="text-2xl font-semibold leading-tight">{base.title}</p>
+                <p className="text-sm text-muted line-clamp-4 md:line-clamp-5">{base.description}</p>
                 <p className="text-xs text-muted">{base.category_path}</p>
               </div>
             </div>
           </div>
         )}
 
-        <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+        <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
           {cands.map((c) => {
             const id = c.id;
             const isSel = selected.has(id);
@@ -113,10 +136,19 @@ export default function EvalPage() {
           })}
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 text-sm text-muted">
-          <span>Seleccionados: {selected.size}</span>
-          <span>Semilla actual: {seedParam}</span>
-          <span>URL compartible: /eval?seed={seedParam}</span>
+        <div className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-3 text-sm text-muted sm:flex-row sm:justify-between sm:items-center">
+          <div className="flex flex-wrap items-center gap-3">
+            <span>Seleccionados: {selected.size}/{REQUIRED}</span>
+            <span>Semilla: {seedParam}</span>
+            <span>URL: /eval?seed={seedParam}</span>
+          </div>
+          <button
+            onClick={submit}
+            disabled={!base || selected.size < REQUIRED || saving}
+            className="inline-flex items-center gap-2 rounded-full border border-primary bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm hover:brightness-105 disabled:opacity-50"
+          >
+            <Save className="h-4 w-4" /> Guardar feedback
+          </button>
         </div>
       </div>
     </div>
