@@ -99,7 +99,7 @@ export default function Home() {
 
             <p className="mt-3 text-base leading-relaxed text-muted">
               Search and match products using multimodal embeddings (text and
-              image), with a human validation step for ambiguous cases.
+              image), with a human validation step for ambiguous cases
             </p>
 
             {/* TECH TAGS */}
