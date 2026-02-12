@@ -43,3 +43,9 @@ next-env.d.ts
 # notebooks/data
 
 /notebooks/data
+/notebooks/raw-data
+
+
+/data/*
+!/data/README.md
+!/data/sample_products.jsonl

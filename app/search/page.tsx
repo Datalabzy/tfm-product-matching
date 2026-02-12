@@ -75,18 +75,20 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [allResults, setAllResults] = useState<Result[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
   const perPage = 28;
 
   const handleSearch = () => {
     setLoading(true);
     const params = new URLSearchParams();
     params.set("query", query.trim());
-    params.set("topK", "500");
+    params.set("topK", "5000");
     params.set("mode", "mixto");
     fetch(`/api/search?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         setAllResults(data.results ?? []);
+        setTotalCount(typeof data.total === "number" ? data.total : null);
         setCurrentPage(1);
       })
       .finally(() => setLoading(false));
@@ -174,6 +176,7 @@ export default function SearchPage() {
               <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted">
                 <p>
                   Showing {paginated.length} of {filtered.length} results
+                  {totalCount && totalCount > filtered.length ? ` (dataset: ${totalCount})` : ""}
                 </p>
                 <span className="rounded-full border border-border/70 bg-primary/5 px-3 py-1 text-[11px] font-semibold text-primary">
                   Similarity search

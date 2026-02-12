@@ -8,6 +8,7 @@ export async function GET(request: Request) {
   const topK = Number(url.searchParams.get("topK")) || 24;
   const modeParam = (url.searchParams.get("mode") || "texto").toLowerCase();
   const mode: "texto" | "imagen" | "mixto" = modeParam === "imagen" ? "imagen" : modeParam === "mixto" || modeParam === "todo" ? "mixto" : "texto";
+  const total = products.length;
 
   // Signals are accepted but not yet applied; future: weight fields accordingly
   let signals: Record<string, boolean> | undefined;
@@ -36,5 +37,5 @@ export async function GET(request: Request) {
     };
   });
 
-  return NextResponse.json({ results, mode, signals: signals ?? null });
+  return NextResponse.json({ results, total, mode, signals: signals ?? null });
 }
