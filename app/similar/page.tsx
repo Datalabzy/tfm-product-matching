@@ -87,7 +87,7 @@ function SmartConnectionsContent() {
   const [showDiscarded, setShowDiscarded] = useState(false);
 
   // validation state
-  const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
+  const [selectedMatchIds, setSelectedMatchIds] = useState<Set<string>>(new Set());
   const [discardedIds, setDiscardedIds] = useState<Set<string>>(new Set());
 
   const selectedMatch = origin;
@@ -96,7 +96,7 @@ function SmartConnectionsContent() {
     if (!clientId) return;
     setLoading(true);
     setCandidates([]);
-    setSelectedMatchId(null);
+    setSelectedMatchIds(new Set());
     setDiscardedIds(new Set());
     try {
       const res = await fetch(`/api/matchings?clientId=${encodeURIComponent(clientId)}`);
@@ -115,7 +115,7 @@ function SmartConnectionsContent() {
       }
       setOrigin(data.client ?? null);
       setCandidates((data.competitors ?? []).map((c) => ({ ...c, is_active: c.is_active ?? true })) as Candidate[]);
-      setSelectedMatchId(null);
+      setSelectedMatchIds(new Set());
       setDiscardedIds(new Set());
     } finally {
       setLoading(false);
@@ -177,7 +177,11 @@ function SmartConnectionsContent() {
 
   const discardCandidate = (id: string) => {
     setDiscardedIds((prev) => new Set(prev).add(id));
-    if (selectedMatchId === id) setSelectedMatchId(null);
+    setSelectedMatchIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
   };
 
   const restoreCandidate = (id: string) => {
@@ -189,12 +193,10 @@ function SmartConnectionsContent() {
   };
 
   const confirmMatch = async () => {
-    if (!origin?.id || !selectedMatchId) return;
-
-    // TODO: luego lo mandas a Supabase / DB
-    // endpoint sugerido: POST /api/feedback/match
-    // body: { clientProductId, competitorProductId, decision: "match" }
-    alert(`MATCH confirmado: ${origin.id} -> ${selectedMatchId}`);
+    if (!origin?.id || selectedMatchIds.size === 0) return;
+    alert(
+      `MATCH confirmado: ${origin.id} -> ${Array.from(selectedMatchIds).join(", ")} (mock; persistencia pendiente)`
+    );
   };
 
   const markNoMatch = async () => {
@@ -337,9 +339,9 @@ function SmartConnectionsContent() {
                     <p className="text-base font-semibold leading-tight line-clamp-2">{origin.title}</p>
                     <p className="text-xs text-muted line-clamp-1">{origin.category_path}</p>
                   </div>
-                  {selectedMatchId && (
+                  {selectedMatchIds.size>0 && (
                     <span className="ml-auto rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                      Match selected
+                      Matches selected
                     </span>
                   )}
                 </div>
@@ -362,8 +364,8 @@ function SmartConnectionsContent() {
                     <div
                       key={`${c.id}-${idx}`}
                       className={`rounded-2xl border p-4 transition ${
-                        selectedMatchId === c.id
-                          ? "border-primary/70 bg-primary/5 shadow-sm ring-1 ring-primary/30"
+                        selectedMatchIds.has(c.id)
+                          ? "border-emerald-500/70 bg-emerald-50 shadow-sm ring-1 ring-emerald-300/40"
                           : "border-border/70 bg-card-muted hover:border-primary/30 hover:shadow-sm"
                       } ${isDiscarded ? "opacity-60" : ""}`}
                     >
@@ -390,10 +392,15 @@ function SmartConnectionsContent() {
                       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                         <label className="inline-flex items-center gap-2 text-sm font-semibold">
                           <input
-                            type="radio"
-                            name="selectedMatch"
-                            checked={selectedMatchId === c.id}
-                            onChange={() => setSelectedMatchId(c.id)}
+                            type="checkbox"
+                            checked={selectedMatchIds.has(c.id)}
+                            onChange={() =>
+                              setSelectedMatchIds((prev) => {
+                                const next = new Set(prev);
+                                next.has(c.id) ? next.delete(c.id) : next.add(c.id);
+                                return next;
+                              })
+                            }
                             disabled={isDiscarded}
                             className="h-4 w-4"
                           />
