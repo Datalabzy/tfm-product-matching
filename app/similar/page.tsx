@@ -81,8 +81,8 @@ function SmartConnectionsContent() {
   const CLIENT_PAGE_SIZE = 8;
 
   // UI controls
-  const [topK, setTopK] = useState(25);
-  const [threshold, setThreshold] = useState(60); // %
+  const [topK, setTopK] = useState(12);
+  const [threshold, setThreshold] = useState(50); // %
   const [sortBy, setSortBy] = useState<"score" | "title">("score");
   const [showDiscarded, setShowDiscarded] = useState(false);
 

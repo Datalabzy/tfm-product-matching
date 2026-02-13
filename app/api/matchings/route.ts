@@ -64,12 +64,17 @@ type MatchingProduct = {
   similarity?: number;
   score?: number;
   is_active?: boolean;
+  is_distractor?: boolean;
 };
 
 type MatchingPair = {
   pair_id: number;
   client_id: string;
   competitor_id: string;
+  label?: number;
+  is_distractor?: boolean;
+  score?: number;
+  similarity?: number;
 };
 
 type Cache = {
@@ -134,25 +139,21 @@ async function loadCache(): Promise<Cache> {
     pairs.forEach((pair) => {
       const client = byId.get(pair.client_id);
       const competitor = byId.get(pair.competitor_id);
-      if (!client) return;
+      if (!client || !competitor) return;
 
-      // Calculamos una similitud rápida texto-texto si no viene en el JSON
-      if (competitor) {
-        const hasScore = typeof competitor.similarity === "number" || typeof competitor.score === "number";
-        if (!hasScore) {
-          const v1 = embedText(`${client.title ?? ""} ${client.description ?? ""}`);
-          const v2 = embedText(`${competitor.title ?? ""} ${competitor.description ?? ""}`);
-          const simText = cosine(v1, v2); // 0..1 aprox
-          const simBrand = brandScore(client.brand, competitor.brand);
-          const simCat = categoryScore(client.category_path, competitor.category_path);
-          const combined = 0.7 * simText + 0.2 * simBrand + 0.1 * simCat;
-          competitor.similarity = combined * 100;
-          competitor.score = combined;
-        }
-      }
+      // Propagamos scores precalculados desde pairs si existen
+      const score = typeof pair.score === "number" ? pair.score : competitor.score;
+      const sim = typeof pair.similarity === "number" ? pair.similarity : competitor.similarity;
+      const enrichedCompetitor: MatchingProduct = {
+        ...competitor,
+        score: score,
+        similarity: sim,
+        is_active: competitor.is_active !== false,
+        is_distractor: pair.is_distractor ?? competitor.is_distractor ?? false,
+      };
 
       const bucket = byClient.get(pair.client_id) || { client, competitors: [] };
-      if (competitor) bucket.competitors.push(competitor);
+      bucket.competitors.push(enrichedCompetitor);
       byClient.set(pair.client_id, bucket);
     });
 
@@ -215,6 +216,7 @@ export async function GET(request: Request) {
   const limit = Math.max(1, Math.min(Number(url.searchParams.get("limit")) || 12, 50));
   const offset = Math.max(0, Number(url.searchParams.get("offset")) || 0);
   const noCache = url.searchParams.get("nocache");
+  const topKParam = Number(url.searchParams.get("topK")) || 12;
 
   if (noCache) {
     cache = null;
@@ -237,7 +239,9 @@ export async function GET(request: Request) {
     if (!data) {
       return NextResponse.json({ error: "client not found", clientIds }, { status: 404 });
     }
-    return NextResponse.json({ clientIds, client: data.client, competitors: data.competitors });
+    const sorted = [...data.competitors].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+    const limited = sorted.slice(0, Math.max(1, topKParam));
+    return NextResponse.json({ clientIds, client: data.client, competitors: limited });
   }
 
   // default: solo listamos ids
