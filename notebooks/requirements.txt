@@ -10,6 +10,9 @@ scipy>=1.13
 unidecode>=1.3
 joblib>=1.4
 
+# Embeddings texto
+sentence-transformers>=2.2.2
+
 # Embeddings (opcional: ResNet/CLIP)
 torch>=2.3
 torchvision>=0.18

@@ -34,6 +34,23 @@ function cosine(a: number[], b: number[]): number {
   return dot;
 }
 
+function brandScore(a?: string, b?: string): number {
+  if (!a || !b) return 0;
+  return a.trim().toLowerCase() === b.trim().toLowerCase() ? 1 : 0;
+}
+
+function categoryScore(a?: string, b?: string): number {
+  if (!a || !b) return 0;
+  const split = (s: string) => s.toLowerCase().split(">").map((x) => x.trim()).filter(Boolean);
+  const ca = split(a);
+  const cb = split(b);
+  if (!ca.length || !cb.length) return 0;
+  const setA = new Set(ca);
+  const common = cb.filter((x) => setA.has(x)).length;
+  const denom = Math.max(ca.length, cb.length);
+  return denom ? common / denom : 0;
+}
+
 type MatchingProduct = {
   id: string;
   title: string;
@@ -125,9 +142,12 @@ async function loadCache(): Promise<Cache> {
         if (!hasScore) {
           const v1 = embedText(`${client.title ?? ""} ${client.description ?? ""}`);
           const v2 = embedText(`${competitor.title ?? ""} ${competitor.description ?? ""}`);
-          const sim = cosine(v1, v2); // 0..1 aprox
-          competitor.similarity = sim * 100;
-          competitor.score = sim;
+          const simText = cosine(v1, v2); // 0..1 aprox
+          const simBrand = brandScore(client.brand, competitor.brand);
+          const simCat = categoryScore(client.category_path, competitor.category_path);
+          const combined = 0.7 * simText + 0.2 * simBrand + 0.1 * simCat;
+          competitor.similarity = combined * 100;
+          competitor.score = combined;
         }
       }
 
