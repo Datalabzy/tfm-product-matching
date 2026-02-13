@@ -136,27 +136,38 @@ async function loadCache(): Promise<Cache> {
       byClient.set(pair.client_id, bucket);
     });
 
-    // Reescalamos scores por cliente para evitar 0%/100% y mantener orden relativo
+    // Pool de competidores (solo si quisieras añadir ruido desde el backend; desactivado por defecto)
+    const competitorPool = products.filter((p) => p.source === "competitor");
+
+    // Recalcular scores crudos (0-100). Distractores se desactivan; se recomienda generarlos en notebook 4.
+    const NUM_DISTRACTORS = 0;
     byClient.forEach((bucket) => {
-      const sims = bucket.competitors
-        .map((c) => (typeof c.score === "number" ? c.score : null))
-        .filter((s): s is number => s !== null);
-      if (sims.length === 0) return;
-      const min = Math.min(...sims);
-      const max = Math.max(...sims);
-      const span = max - min;
-      const LOW = 0.9;
-      const HIGH = 0.99;
-      const scaledComps = bucket.competitors.map((c) => {
-        if (typeof c.score !== "number") return c;
-        const norm = span < 1e-6 ? 0.5 : (c.score - min) / (span || 1); // 0..1
-        const scaled = LOW + norm * (HIGH - LOW); // 0.90 - 0.99 aprox
-        return { ...c, score: scaled, similarity: scaled * 100 };
+      const clientVec = embedText(`${bucket.client.title ?? ""} ${bucket.client.description ?? ""}`);
+
+      // Calcular score real a 0-100 para los gold
+      const scoredGold = bucket.competitors.map((c) => {
+        const vec = embedText(`${c.title ?? ""} ${c.description ?? ""}`);
+        const sim = cosine(clientVec, vec);
+        return { ...c, score: sim, similarity: sim * 100, is_active: c.is_active ?? true };
       });
+
+      // Añadimos distractores aleatorios que no estén ya en la lista
+      const existingIds = new Set(scoredGold.map((c) => c.id));
+      const distractors: MatchingProduct[] = [];
+      for (let i = 0; i < competitorPool.length && distractors.length < NUM_DISTRACTORS; i++) {
+        const cand = competitorPool[Math.floor(Math.random() * competitorPool.length)];
+        if (existingIds.has(cand.id)) continue;
+        existingIds.add(cand.id);
+        const vec = embedText(`${cand.title ?? ""} ${cand.description ?? ""}`);
+        const sim = cosine(clientVec, vec);
+        distractors.push({ ...cand, score: sim, similarity: sim * 100, is_active: true });
+      }
+
+      const merged = [...scoredGold, ...distractors];
 
       // Deduplicamos por competidor, quedándonos con el mayor score
       const dedup = new Map<string, MatchingProduct>();
-      scaledComps.forEach((c) => {
+      merged.forEach((c) => {
         const existing = dedup.get(c.id);
         if (!existing) {
           dedup.set(c.id, c);
@@ -166,6 +177,7 @@ async function loadCache(): Promise<Cache> {
         const sOld = typeof existing.score === "number" ? existing.score : -1;
         if (sNew > sOld) dedup.set(c.id, c);
       });
+
       bucket.competitors = Array.from(dedup.values());
     });
 
@@ -182,6 +194,12 @@ export async function GET(request: Request) {
   const listParam = url.searchParams.get("list");
   const limit = Math.max(1, Math.min(Number(url.searchParams.get("limit")) || 12, 50));
   const offset = Math.max(0, Number(url.searchParams.get("offset")) || 0);
+  const noCache = url.searchParams.get("nocache");
+
+  if (noCache) {
+    cache = null;
+    cachePromise = null;
+  }
 
   const { byClient, clientIds } = await loadCache();
 
