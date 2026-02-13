@@ -145,10 +145,12 @@ async function loadCache(): Promise<Cache> {
       const min = Math.min(...sims);
       const max = Math.max(...sims);
       const span = max - min;
+      const LOW = 0.9;
+      const HIGH = 0.99;
       const scaledComps = bucket.competitors.map((c) => {
         if (typeof c.score !== "number") return c;
-        const norm = span < 1e-6 ? 0.75 : (c.score - min) / (span || 1); // 0..1
-        const scaled = 0.6 + norm * 0.39; // 0.60 - 0.99
+        const norm = span < 1e-6 ? 0.5 : (c.score - min) / (span || 1); // 0..1
+        const scaled = LOW + norm * (HIGH - LOW); // 0.90 - 0.99 aprox
         return { ...c, score: scaled, similarity: scaled * 100 };
       });
 
