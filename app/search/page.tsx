@@ -62,8 +62,8 @@ function NoResults() {
   return (
     <div className="mt-8 flex flex-col items-center justify-center gap-4 rounded-2xl border border-border bg-card-muted px-6 py-8 text-center">
       <div className="space-y-1">
-        <p className="text-base font-semibold text-fg md:text-lg">No matches found</p>
-        <p className="text-sm text-muted">Try another query, broaden terms, or clear filters.</p>
+        <p className="text-base font-semibold text-fg md:text-lg">Sin resultados</p>
+        <p className="text-sm text-muted">Prueba otra búsqueda, amplía términos o limpia filtros.</p>
       </div>
       <div ref={lottieRef} className="h-48 w-full max-w-[360px] md:h-64" />
     </div>
@@ -121,20 +121,24 @@ export default function SearchPage() {
           <div className="flex flex-wrap items-center gap-3 text-sm font-semibold text-primary">
             <Link href="/" className="inline-flex items-center gap-2 hover:underline">
               <ArrowLeft className="h-4 w-4" />
-              Home
+              Inicio
             </Link>
             <span className="text-muted">/</span>
-            <span className="text-muted font-normal">Search</span>
+            <span className="text-muted font-normal">Búsqueda</span>
           </div>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-2">
               <h1 className="inline-flex items-center gap-2 text-3xl font-semibold tracking-tight md:text-4xl">
                 <SearchIcon className="h-6 w-6 text-primary" />
-                Semantic search
+                Búsqueda semántica
               </h1>
               <p className="max-w-3xl text-base leading-relaxed text-muted">
-                Free-text queries ranked by embedding similarity across your catalog.
+                Consultas en lenguaje natural ordenadas por similitud de embeddings sobre el catálogo.
               </p>
+              <div className="max-w-3xl rounded-2xl border border-primary/15 bg-primary/5 px-4 py-3 text-sm text-muted">
+                Búsqueda semántica (texto / imagen) con ordenación por similitud de embeddings.<br />
+                Úsala para aterrizar rápido en el recomendador item-to-item.
+              </div>
             </div>
           </div>
         </header>
@@ -150,24 +154,24 @@ export default function SearchPage() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   type="text"
-                  placeholder="Search products..."
+                  placeholder="Buscar productos..."
                   className="w-full bg-transparent text-sm text-fg outline-none placeholder:text-muted"
                 />
               </div>
-              <p className="text-xs text-muted">Search by attributes, style, color, or product type.</p>
+              <p className="text-xs text-muted">Busca por atributos, estilo, color o tipo de producto.</p>
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={handleSearch}
                   disabled={loading}
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-hover disabled:opacity-60"
                 >
-                  Search
+                  Buscar
                 </button>
                 <button
                   onClick={() => setQuery("")}
                   className="inline-flex items-center justify-center rounded-xl border border-border px-3 py-2 text-sm font-semibold text-fg hover:bg-card-muted"
                 >
-                  Clear
+                  Limpiar
                 </button>
               </div>
             </aside>
@@ -175,11 +179,11 @@ export default function SearchPage() {
             <section className="space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted">
                 <p>
-                  Showing {paginated.length} of {filtered.length} results
-                  {totalCount && totalCount > filtered.length ? ` (dataset: ${totalCount})` : ""}
+                  Mostrando {paginated.length} de {filtered.length} resultados
+                  {totalCount && totalCount > filtered.length ? ` (total dataset: ${totalCount})` : ""}
                 </p>
                 <span className="rounded-full border border-border/70 bg-primary/5 px-3 py-1 text-[11px] font-semibold text-primary">
-                  Similarity search
+                  Búsqueda por similitud
                 </span>
               </div>
               {paginated.length === 0 ? (
@@ -204,7 +208,7 @@ export default function SearchPage() {
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={r.image_url || r.image} alt={r.title} className="h-full w-full object-contain" />
                           ) : (
-                            "No image"
+                            "Sin imagen"
                           )}
                         </div>
                         <div className="mt-3 flex-1 space-y-1">
@@ -222,17 +226,17 @@ export default function SearchPage() {
                         className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-fg hover:bg-card-muted disabled:opacity-40"
                       >
                         <ChevronLeft className="h-4 w-4" />
-                        Prev
+                        Anterior
                       </button>
                       <span>
-                        Page {currentPage} / {pageCount}
+                        Página {currentPage} / {pageCount}
                       </span>
                       <button
                         onClick={() => setCurrentPage((p) => Math.min(pageCount, p + 1))}
                         disabled={currentPage >= pageCount}
                         className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-fg hover:bg-card-muted disabled:opacity-40"
                       >
-                        Next
+                        Siguiente
                         <ChevronRight className="h-4 w-4" />
                       </button>
                     </div>

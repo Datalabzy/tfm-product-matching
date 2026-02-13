@@ -90,25 +90,27 @@ export default function Home() {
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-full text-primary">
                 <Sparkles className="h-3 w-3" />
               </span>
-              TFM — Master Data Science
+              TFM — Máster en Data Science
             </div>
 
             <h1 className="mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
-              Multimodal Product Similarity & Matching
+              Matching de productos con embeddings multimodales
             </h1>
 
             <p className="mt-3 text-base leading-relaxed text-muted">
-              Search and match products using multimodal embeddings (text and
-              image), with a human validation step for ambiguous cases
+              Busca, recomienda y conecta productos usando embeddings de texto e imagen, con un paso de validación humana en los casos ambiguos.
             </p>
+            <div className="mt-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted">
+              Cada sección resume su propósito y el endpoint que consume.<br/>Los resultados y el feedback se guardan en JSON locales para el TFM.
+            </div>
 
             {/* TECH TAGS */}
             <div className="mt-5 flex flex-wrap gap-2 text-sm">
               <span className="rounded-full border border-border/70 bg-primary/5 px-3 py-1 text-muted">
-                cosine similarity
+                similitud del coseno
               </span>
               <span className="rounded-full border border-border/70 bg-primary/5 px-3 py-1 text-muted">
-                multimodal embeddings
+                embeddings multimodales
               </span>
             </div>
           </div>
@@ -131,10 +133,10 @@ export default function Home() {
           </span>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-              Explore
+              Explora
             </p>
             <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
-              Use cases
+              Casos de uso
             </h2>
           </div>
         </div>
@@ -143,37 +145,37 @@ export default function Home() {
           <CaseCard
             href="/search"
             icon={<Search className="h-5 w-5" />}
-            tag="Case 1"
-            title="Semantic search"
-            desc="Free-text queries ranked by embedding similarity."
-            cta="Go to Case 1 →"
+            tag="Caso 1"
+            title="Búsqueda semántica"
+            desc="Consultas en lenguaje natural ordenadas por similitud de embeddings."
+            cta="Ir al Caso 1 →"
           />
 
           <CaseCard
             href="/recommender"
             icon={<Repeat2 className="h-5 w-5" />}
-            tag="Case 2"
-            title="Product recommender"
-            desc="Item-to-item recommendations based on vector similarity."
-            cta="Go to Case 2 →"
+            tag="Caso 2"
+            title="Recomendador de productos"
+            desc="Sugerencias item-to-item basadas en similitud vectorial."
+            cta="Ir al Caso 2 →"
           />
 
           <CaseCard
             href="/similar"
             icon={<Link2 className="h-5 w-5" />}
-            tag="Case 3"
+            tag="Caso 3"
             title="Smart Connections"
-            desc="Client–competitor product matching with scoring and validation."
-            cta="Go to Case 3 →"
+            desc="Matching cliente–competidor con puntuación y validación manual."
+            cta="Ir al Caso 3 →"
           />
 
           <CaseCard
             href="/eval"
             icon={<Sparkles className="h-5 w-5" />}
-            tag="Case 4"
-            title="Human eval"
-            desc="Evalúa 10 candidatos (5 top + 5 aleatorios) para medir precisión humana."
-            cta="Go to Case 4 →"
+            tag="Caso 4"
+            title="Evaluación humana"
+            desc="Evalúa 10 candidatos (5 top + 5 aleatorios) para medir precisión percibida."
+            cta="Ir al Caso 4 →"
           />
         </div>
       </section>

@@ -11,10 +11,10 @@ export function SiteHeader() {
             </div>
             <div className="leading-tight min-w-0">
               <p className="text-base font-semibold text-fg truncate">
-                Multimodal Product Matching
+                Matching de productos multimodal
               </p>
               <p className="text-sm text-muted hidden sm:block">
-                Search, recommendation & smart connections with embeddings
+                Búsqueda, recomendación y conexiones con embeddings
               </p>
             </div>
           </Link>

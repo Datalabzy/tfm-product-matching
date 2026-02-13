@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { ArrowLeft, Check, Save } from "lucide-react";
+import { ArrowLeft, Check, Save, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 type Product = {
@@ -70,17 +70,24 @@ function EvalContent() {
       <div className="mx-auto flex w-full max-w-screen-xl flex-col gap-6 px-4 py-8 md:px-8 md:py-10">
         <div className="flex flex-wrap items-center gap-3 text-sm font-semibold text-primary">
           <Link href="/" className="inline-flex items-center gap-2 hover:underline">
-            <ArrowLeft className="h-4 w-4" /> Home
+            <ArrowLeft className="h-4 w-4" /> Inicio
           </Link>
           <span className="text-muted">/</span>
-          <span className="text-muted font-normal">Eval</span>
+          <span className="text-muted font-normal">Evaluación</span>
         </div>
 
         <header className="space-y-2">
-          <h1 className="text-3xl font-semibold tracking-tight">Human eval</h1>
+          <h1 className="flex items-center gap-2 text-3xl font-semibold tracking-tight">
+            <Sparkles className="h-6 w-6 text-primary" />
+            Evaluación humana
+          </h1>
           <p className="text-muted">
             Selecciona {REQUIRED} candidatos (de {total || "…"}) que más se parezcan al producto base. Semilla: {seedParam}
           </p>
+          <div className="text-sm text-muted max-w-3xl rounded-2xl border border-primary/15 bg-primary/5 px-4 py-3 space-y-1">
+            <p>Recoge feedback humano: tus elecciones se guardan en un JSON local y sirven para validar la calidad de los embeddings.</p>
+            <p className="text-xs">Persistencia local: <code className="text-primary">data/eval_feedback.jsonl</code></p>
+          </div>
         </header>
 
         {base && (

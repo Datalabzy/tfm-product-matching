@@ -117,25 +117,28 @@ function RecommenderContent() {
           <div className="flex flex-wrap items-center gap-3 text-sm font-semibold text-primary">
             <Link href="/" className="inline-flex items-center gap-2 hover:underline">
               <ArrowLeft className="h-4 w-4" />
-              Home
+              Inicio
             </Link>
             <span className="text-muted">/</span>
-            <span className="text-muted font-normal">Recommender</span>
+            <span className="text-muted font-normal">Recomendador</span>
           </div>
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2 text-lg">
               <h1 className="inline-flex items-center gap-2 text-3xl font-semibold tracking-tight text-fg">
                 <Repeat2 className="h-6 w-6 text-primary" />
-                Product recommender
+                Recomendador de productos
               </h1>
-              <p className="text-lg text-muted">Choose an origin product and see the closest items by similarity.</p>
+              <p className="text-lg text-muted">Elige un producto origen y visualiza los más similares por embeddings.</p>
+              <div className="text-sm text-muted max-w-3xl rounded-2xl border border-primary/15 bg-primary/5 px-4 py-3">
+                Recomendación item-to-item con filtros por señales de texto e imagen. Cambia el modo o las señales para recalcular en vivo.
+              </div>
             </div>
           </div>
         </header>
 
         <main className="grid flex-1 grid-cols-1 gap-6 xl:grid-cols-[380px_1fr]">
           <section className="rounded-3xl border border-border bg-card p-5 text-lg shadow-sm">
-            <p className="mt-2 text-md font-semibold uppercase text-primary">Origin product</p>
+            <p className="mt-2 text-md font-semibold uppercase text-primary">Producto origen</p>
             <div className="mt-4">
               <div className="flex gap-4">
                 <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-xl border border-border bg-white text-[11px] text-muted">
@@ -171,7 +174,7 @@ function RecommenderContent() {
               <div className="flex flex-col gap-2 text-xs">
                 {mode !== "Solo imagen" && (
                   <>
-                    <div className="font-semibold uppercase tracking-wide text-primary">Text signals</div>
+                    <div className="font-semibold uppercase tracking-wide text-primary">Señales de texto</div>
                     {(["title", "description", "category"] as const).map((key) => (
                       <label key={key} className="inline-flex items-center gap-2">
                         <input
@@ -180,14 +183,14 @@ function RecommenderContent() {
                           onChange={() => setSignals((prev) => ({ ...prev, [key]: !prev[key] }))}
                           className="h-3 w-3 rounded border border-border bg-card"
                         />
-                        <span className="text-muted">{key === "title" ? "Title" : key === "description" ? "Description" : "Category"}</span>
+                        <span className="text-muted">{key === "title" ? "Título" : key === "description" ? "Descripción" : "Categoría"}</span>
                       </label>
                     ))}
                   </>
                 )}
                 {mode !== "Solo texto" && mode !== "Solo imagen" && (
                   <>
-                    <div className="font-semibold uppercase tracking-wide text-primary">Visual signal</div>
+                    <div className="font-semibold uppercase tracking-wide text-primary">Señal visual</div>
                     <label className="inline-flex items-center gap-2">
                       <input
                         type="checkbox"
@@ -195,7 +198,7 @@ function RecommenderContent() {
                         onChange={() => setSignals((prev) => ({ ...prev, image: !prev.image }))}
                         className="h-3 w-3 rounded border border-border bg-card"
                       />
-                      <span className="text-muted">Image</span>
+                      <span className="text-muted">Imagen</span>
                     </label>
                   </>
                 )}
@@ -206,8 +209,8 @@ function RecommenderContent() {
           <section className="rounded-3xl border border-border bg-card p-5 shadow-sm">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase text-primary">Suggestions</p>
-                <p className="text-sm text-muted">Similar items ranked by embeddings.</p>
+                <p className="text-xs font-semibold uppercase text-primary">Sugerencias</p>
+                <p className="text-sm text-muted">Ítems similares ordenados por embeddings.</p>
               </div>
               <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold text-primary">
                 <span className="rounded-full bg-primary/10 px-3 py-1">Top‑{topK}</span>
@@ -234,14 +237,14 @@ function RecommenderContent() {
                   </select>
                 </label>
                 <label className="flex items-center gap-2">
-                  <span className="text-muted">Sort by</span>
+                  <span className="text-muted">Ordenar por</span>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as "score" | "title")}
                     className="rounded-full border border-border bg-card px-3 py-1 text-fg"
                   >
-                    <option value="score">Relevance</option>
-                    <option value="title">Title</option>
+                    <option value="score">Relevancia</option>
+                    <option value="title">Título</option>
                   </select>
                 </label>
               </div>
@@ -249,7 +252,7 @@ function RecommenderContent() {
             <div className="relative mt-4">
               {loading && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-bg/70 backdrop-blur-sm text-sm text-primary">
-                  Loading similar items...
+                  Cargando similares...
                 </div>
               )}
               <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
@@ -264,7 +267,7 @@ function RecommenderContent() {
                     }}
                     className="flex flex-col rounded-2xl border border-border/70 bg-card-muted p-4 text-left transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
                     style={{ minHeight: "320px" }}
-                    aria-label={`View similar items to ${item.title}`}
+                      aria-label={`Ver similares a ${item.title}`}
                   >
                     <div className="flex h-40 items-center justify-center overflow-hidden rounded-xl bg-white text-[11px] text-muted">
                       {renderImage(item.image_url || item.image, item.title)}
@@ -299,17 +302,17 @@ function RecommenderContent() {
                   className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-fg hover:bg-card-muted disabled:opacity-40"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  Prev
+                  Anterior
                 </button>
                 <span>
-                  Page {currentPage} / {pageCount}
+                  Página {currentPage} / {pageCount}
                 </span>
                 <button
                   onClick={() => setCurrentPage((p) => Math.min(pageCount, p + 1))}
                   disabled={currentPage >= pageCount}
                   className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-fg hover:bg-card-muted disabled:opacity-40"
                 >
-                  Next
+                  Siguiente
                   <ChevronRight className="h-4 w-4" />
                 </button>
               </div>

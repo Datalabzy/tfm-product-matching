@@ -214,7 +214,7 @@ function SmartConnectionsContent() {
           <div className="flex flex-wrap items-center gap-3 text-sm font-semibold text-primary">
             <Link href="/" className="inline-flex items-center gap-2 hover:underline">
               <ArrowLeft className="h-4 w-4" />
-              Home
+              Inicio
             </Link>
             <span className="text-muted">/</span>
             <span className="text-muted font-normal">Smart Connections</span>
@@ -226,8 +226,11 @@ function SmartConnectionsContent() {
               Smart Connections (1→N)
             </h1>
             <p className="text-lg text-muted">
-              Pick the best competitor equivalent for a client product. Includes thresholding and manual validation.
+              Selecciona el equivalente de competidor más adecuado para un producto del cliente. Incluye umbral y validación manual.
             </p>
+            <div className="text-sm text-muted max-w-4xl rounded-2xl border border-primary/15 bg-primary/5 px-4 py-3">
+              Matching 1→N entre catálogo cliente y competidores (texto+imagen precomputado). Ajusta umbral, descarta ruido y confirma uno o varios matches.
+            </div>
           </div>
         </header>
 
@@ -246,7 +249,7 @@ function SmartConnectionsContent() {
                     disabled={clientPage === 0}
                     className="rounded-full border border-border px-3 py-1 text-[11px] font-semibold text-fg disabled:opacity-40"
                   >
-                    Prev
+                    Anterior
                   </button>
                   <button
                     onClick={() => {
@@ -256,7 +259,7 @@ function SmartConnectionsContent() {
                     disabled={clientList.length < CLIENT_PAGE_SIZE}
                     className="rounded-full border border-border px-3 py-1 text-[11px] font-semibold text-fg disabled:opacity-40"
                   >
-                    Next
+                    Siguiente
                   </button>
                 </div>
               </div>
@@ -273,7 +276,7 @@ function SmartConnectionsContent() {
                     }`}
                   >
                     <div className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white text-[11px] text-muted">
-                      {c.image_url ? renderImage(c.image_url, c.title) : "No image"}
+                    {c.image_url ? renderImage(c.image_url, c.title) : "Sin imagen"}
                     </div>
                     <p className="text-sm font-semibold text-fg line-clamp-2">{c.title}</p>
                     <p className="text-[11px] text-muted line-clamp-1">{c.category_path}</p>
@@ -287,12 +290,12 @@ function SmartConnectionsContent() {
           <section className="rounded-3xl border border-border bg-card p-5 shadow-sm space-y-4">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase text-primary">Competitor candidates</p>
+                <p className="text-xs font-semibold uppercase text-primary">Candidatos de competidor</p>
               </div>
 
               <div className="flex flex-wrap items-center gap-3 text-xs">
                 <label className="flex items-center gap-2">
-                  <span className="text-muted">Threshold</span>
+                  <span className="text-muted">Umbral</span>
                   <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">{threshold}%</span>
                   <input
                     type="range"
@@ -303,7 +306,7 @@ function SmartConnectionsContent() {
                   />
                 </label>
                 <label className="flex items-center gap-2">
-                  <span className="text-muted">Sort</span>
+                  <span className="text-muted">Ordenar</span>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as "score" | "title")}
@@ -320,11 +323,11 @@ function SmartConnectionsContent() {
                     onChange={(e) => setShowDiscarded(e.target.checked)}
                     className="h-4 w-4 rounded border border-border bg-card"
                   />
-                  <span className="text-muted">Show discarded</span>
+                  <span className="text-muted">Ver descartados</span>
                 </label>
-                <span className="rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary">
-                  showing {visibleCandidates.length}
-                </span>
+                  <span className="rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary">
+                    mostrando {visibleCandidates.length}
+                  </span>
               </div>
             </div>
 
@@ -333,7 +336,7 @@ function SmartConnectionsContent() {
                 <p className="text-xs uppercase font-semibold text-primary">Cliente activo</p>
                 <div className="mt-3 flex items-center gap-4">
                   <div className="h-20 w-20 overflow-hidden rounded-xl border border-border bg-white">
-                    {origin.image_url || origin.image ? renderImage(origin.image_url || origin.image, origin.title) : "No image"}
+                    {origin.image_url || origin.image ? renderImage(origin.image_url || origin.image, origin.title) : "Sin imagen"}
                   </div>
                   <div className="min-w-0 space-y-1">
                     <p className="text-base font-semibold leading-tight line-clamp-2">{origin.title}</p>
@@ -341,7 +344,7 @@ function SmartConnectionsContent() {
                   </div>
                   {selectedMatchIds.size>0 && (
                     <span className="ml-auto rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                      Matches selected
+                      Matches seleccionados
                     </span>
                   )}
                 </div>
@@ -351,7 +354,7 @@ function SmartConnectionsContent() {
             <div className="relative">
               {loading && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-bg/70 backdrop-blur-sm text-sm text-primary">
-                  Loading candidates...
+                  Cargando candidatos...
                 </div>
               )}
 
@@ -371,7 +374,7 @@ function SmartConnectionsContent() {
                     >
                       <div className="flex items-start gap-3">
                         <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-xl border border-border bg-white text-[11px] text-slate-500">
-                          {c.image_url || c.image ? renderImage(c.image_url || c.image, c.title) : "No image"}
+                          {c.image_url || c.image ? renderImage(c.image_url || c.image, c.title) : "Sin imagen"}
                         </div>
 
                         <div className="min-w-0 flex-1">
@@ -404,7 +407,7 @@ function SmartConnectionsContent() {
                             disabled={isDiscarded}
                             className="h-4 w-4"
                           />
-                          <span className={isDiscarded ? "text-muted" : "text-fg"}>Select match</span>
+                          <span className={isDiscarded ? "text-muted" : "text-fg"}>Seleccionar match</span>
                         </label>
 
                         <div className="flex items-center gap-2">
@@ -414,7 +417,7 @@ function SmartConnectionsContent() {
                               className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold hover:bg-card-muted"
                             >
                               <Ban className="h-4 w-4 text-primary" />
-                              Discard
+                              Descartar
                             </button>
                           ) : (
                             <button
@@ -422,7 +425,7 @@ function SmartConnectionsContent() {
                               className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold hover:bg-card-muted"
                             >
                               <RefreshCw className="h-4 w-4 text-primary" />
-                              Restore
+                              Restaurar
                             </button>
                           )}
                         </div>
@@ -434,7 +437,7 @@ function SmartConnectionsContent() {
 
               {!loading && visibleCandidates.length === 0 && (
                 <div className="mt-6 rounded-2xl border border-border bg-card-muted p-6 text-sm text-muted">
-                  No candidates above the current threshold. Try lowering it or enabling “Show discarded”.
+                  No hay candidatos por encima del umbral. Baja el umbral o habilita “Ver descartados”.
                 </div>
               )}
             </div>
