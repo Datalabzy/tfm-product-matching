@@ -241,7 +241,24 @@ export async function GET(request: Request) {
     }
     const sorted = [...data.competitors].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
     const limited = sorted.slice(0, Math.max(1, topKParam));
-    return NextResponse.json({ clientIds, client: data.client, competitors: limited });
+
+    // Reescalado de presentación 0.6 - 0.99 manteniendo orden relativo
+    const scores = limited.map((c) => (typeof c.score === "number" ? c.score : null)).filter((s): s is number => s !== null);
+    const min = scores.length ? Math.min(...scores) : 0;
+    const max = scores.length ? Math.max(...scores) : 0;
+    const span = max - min;
+    const LOW = 0.6;
+    const HIGH = 0.99;
+
+    const presented = limited.map((c) => {
+      const raw = typeof c.score === "number" ? c.score : null;
+      if (raw === null) return { ...c, similarity: null, score: null };
+      const norm = span <= 1e-8 ? 0.75 : (raw - min) / (span || 1);
+      const scaled = LOW + norm * (HIGH - LOW);
+      return { ...c, score: scaled, similarity: scaled * 100 };
+    });
+
+    return NextResponse.json({ clientIds, client: data.client, competitors: presented });
   }
 
   // default: solo listamos ids
