@@ -251,19 +251,25 @@ export async function GET(request: Request) {
     const sorted = [...data.competitors].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
     const limited = sorted.slice(0, Math.max(1, topKParam));
 
-    // Reescalado de presentación 0.6 - 0.99 manteniendo orden relativo
-    const scores = limited.map((c) => (typeof c.score === "number" ? c.score : null)).filter((s): s is number => s !== null);
+    // Reescalado proporcional (min→0, max→1) para visualización; orden se mantiene
+    const scores = limited
+      .map((c) => (typeof c.score === "number" ? c.score : null))
+      .filter((s): s is number => s !== null)
+      .map((s) => Math.max(0, Math.min(s, 1)));
     const min = scores.length ? Math.min(...scores) : 0;
     const max = scores.length ? Math.max(...scores) : 0;
     const span = max - min;
-    const LOW = 0.6;
-    const HIGH = 0.99;
+    const fallback = 0.7;
+    const LOW = 0.02; // 2%
+    const HIGH = 0.98; // 98%
 
     const presented = limited.map((c) => {
       const raw = typeof c.score === "number" ? c.score : null;
       if (raw === null) return { ...c, similarity: null, score: null };
-      const norm = span <= 1e-8 ? 0.75 : (raw - min) / (span || 1);
-      const scaled = LOW + norm * (HIGH - LOW);
+      const clipped = Math.max(0, Math.min(raw, 1));
+      const norm = span > 1e-8 ? (clipped - min) / span : fallback;
+      const scaled01 = Math.max(0, Math.min(norm, 1));
+      const scaled = LOW + scaled01 * (HIGH - LOW);
       return { ...c, score: scaled, similarity: scaled * 100 };
     });
 
