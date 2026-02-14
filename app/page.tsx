@@ -98,11 +98,8 @@ export default function Home() {
             </h1>
 
             <p className="mt-3 text-base leading-relaxed text-muted">
-              Busca, recomienda y conecta productos usando embeddings de texto e imagen, con un paso de validación humana en los casos ambiguos.
+              Busca, recomienda y conecta productos usando embeddings de texto e imagen.
             </p>
-            <div className="mt-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted">
-              Cada sección resume su propósito y el endpoint que consume.<br/>Los resultados y el feedback se guardan en JSON locales para el TFM.
-            </div>
 
             {/* TECH TAGS */}
             <div className="mt-5 flex flex-wrap gap-2 text-sm">
@@ -174,7 +171,7 @@ export default function Home() {
             icon={<Sparkles className="h-5 w-5" />}
             tag="Caso 4"
             title="Evaluación humana"
-            desc="Evalúa 10 candidatos (5 top + 5 aleatorios) para medir precisión percibida."
+            desc="Evalúa 5 candidatos para medir la precisión percibida."
             cta="Ir al Caso 4 →"
           />
         </div>

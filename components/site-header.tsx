@@ -14,7 +14,7 @@ export function SiteHeader() {
                 Matching de productos multimodal
               </p>
               <p className="text-sm text-muted hidden sm:block">
-                Búsqueda, recomendación y conexiones con embeddings
+                Búsqueda, recomendación y creación de conexiones con embeddings
               </p>
             </div>
           </Link>
