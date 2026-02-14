@@ -92,6 +92,8 @@ type Cache = {
 
 const PRODUCTS_FILE = path.join(process.cwd(), "data", "matchings_products.jsonl");
 const PAIRS_FILE = path.join(process.cwd(), "data", "matchings_pairs.jsonl");
+// Peso para combinar texto/imagen cuando vengan en el JSON (si no, se usa score precalculado o se recalcula solo texto)
+const IMAGE_WEIGHT = 0.7; // 70% imagen, 30% texto
 
 let cache: Cache | null = null;
 let cachePromise: Promise<Cache> | null = null;
@@ -169,7 +171,14 @@ async function loadCache(): Promise<Cache> {
       const scoredGold = bucket.competitors.map((c) => {
         const vec = embedText(`${c.title ?? ""} ${c.description ?? ""}`);
         const sim = cosine(clientVec, vec);
-        return { ...c, score: sim, similarity: sim * 100, is_active: c.is_active ?? true };
+        let combined = sim;
+        if (typeof c.score === "number" && typeof c.similarity === "number") {
+          // Si vienen scores precalculados (ej. texto+imagen), combinamos dando más peso a la imagen
+          const textPart = sim;
+          const imgPart = c.score; // asumimos score existente refleja imagen si viene precalculado
+          combined = IMAGE_WEIGHT * imgPart + (1 - IMAGE_WEIGHT) * textPart;
+        }
+        return { ...c, score: combined, similarity: combined * 100, is_active: c.is_active ?? true };
       });
 
       // Añadimos distractores aleatorios que no estén ya en la lista
